@@ -6,7 +6,7 @@ from openpyxl.drawing.image import Image as XLImage
 from PIL import Image
 
 # Titre et logo
-st.image("petit_forestier_logo_officiel.png", width=500)
+st.image("petit_forestier_logo_officiel.png", width=700)
 st.markdown("<h1 style='color:#057A20;'>Générateur de Fiche Technique</h1>", unsafe_allow_html=True)
 st.markdown("---")
 
@@ -17,14 +17,14 @@ except Exception as e:
     st.error(f"Erreur lors du chargement du fichier Excel : {e}")
     st.stop()
 
-# Vérification des colonnes
+
 required_columns = ["Modele", "C_Cabine", "C_Chassis", "C_Caisse", "M_moteur", "C_Groupe frigo", "C_Hayon elevateur"]
 if not all(col in df.columns for col in required_columns):
     st.error("Colonnes manquantes dans le fichier Excel: " + ", ".join(required_columns))
     st.stop()
 
 # Menus déroulants intelligents
-modele = st.selectbox("🔧 Choisir un modèle", sorted(df["Modele"].dropna().unique()))
+modele = st.selectbox("Choisir un modèle", sorted(df["Modele"].dropna().unique()))
 df_filtered = df[df["Modele"] == modele]
 
 code_cabine = st.selectbox("Choisir une cabine", df_filtered["C_Cabine"].dropna().unique())
