@@ -17,8 +17,8 @@ st.markdown("<hr>", unsafe_allow_html=True)
 df = pd.read_excel("bdd_ht.xlsx", sheet_name=0)
 
 
-# Vérifier que les colonnes essentielles existent
-required_columns = ["MODELE", "CABINE", "CHASSIS", "CAISSE", "MOTEUR", "FRIGO", "HAYON"]
+
+required_columns = ["Modele", "C_Cabine", "C_Chassis", "C_Caisse", "M_moteur", "C_Groupe frigo", "C_Hayon elevateur"]
 missing_columns = [col for col in required_columns if col not in df.columns]
 if missing_columns:
     st.error(f"Colonnes manquantes dans le fichier Excel: {', '.join(missing_columns)}")
