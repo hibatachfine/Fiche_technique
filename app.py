@@ -3,12 +3,10 @@ import pandas as pd
 from io import BytesIO
 from openpyxl import Workbook
 
-st.set_page_config(page_title="Fiche Technique - Petit Forestier", layout="centered")
+st.set_page_config(page_title="Fiche Technique", layout="centered")
+st.image("petit_forestier_logo_officiel.png", width=180)
 
-# Logo
-st.image("petit_forestier_logo_officiel.png", width=200)
-st.markdown("<h1 style='text-align: center; color: #147C2B;'>Générateur de Fiche Technique</h1>", unsafe_allow_html=True)
-st.markdown("---")
+st.title("Générateur de Fiche Technique")
 
 @st.cache_data
 def load_data():
