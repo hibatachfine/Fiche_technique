@@ -71,4 +71,18 @@ def generate_excel():
     ws.append(["Groupe Frigo", code_frigo])
     ws.append(["Détail frigo", get_details_by_code(code_frigo)])
     ws.append(["Hayon", code_hayon])
-    ws.append(["D
+    ws.append(["Détail hayon", get_details_by_code(code_hayon)])
+
+    # Export
+    output = BytesIO()
+    wb.save(output)
+    return output
+
+# Bouton
+if st.button("📄 Générer la fiche technique"):
+    excel_file = generate_excel()
+    st.success("✅ Fiche technique générée avec succès !")
+    st.download_button(label="💾 Télécharger le fichier Excel",
+                       data=excel_file.getvalue(),
+                       file_name="fiche_technique.xlsx",
+                       mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
