@@ -1,73 +1,72 @@
 import streamlit as st
 import pandas as pd
 from io import BytesIO
-from openpyxl import Workbook, load_workbook
+from openpyxl import Workbook
+from openpyxl.drawing.image import Image as XLImage
 from PIL import Image
 
-# Charger logo
-st.set_page_config(layout="centered")
-logo = Image.open("petit_forestier_logo_officiel.png")
-st.image(logo, width=180)
+# Titre et logo
+st.image("petit_forestier_logo_officiel.png", width=120)
+st.markdown("<h1 style='color:#057A20;'>Générateur de Fiche Technique</h1>", unsafe_allow_html=True)
+st.markdown("---")
 
-# Titre principal
-st.markdown("<h1 style='text-align: center; color: #017a0c;'>Générateur de Fiche Technique</h1>", unsafe_allow_html=True)
-st.markdown("<hr>", unsafe_allow_html=True)
-
-# Charger les données
-df = pd.read_excel("bdd_ht.xlsx", sheet_name=0)
-
-
-
-required_columns = ["Modele", "C_Cabine", "C_Chassis", "C_Caisse", "M_moteur", "C_Groupe frigo", "C_Hayon elevateur"]
-missing_columns = [col for col in required_columns if col not in df.columns]
-if missing_columns:
-    st.error(f"Colonnes manquantes dans le fichier Excel: {', '.join(missing_columns)}")
+# Chargement des données
+try:
+    df = pd.read_excel("bdd_ht.xlsx", sheet_name="FS_referentiel_produits_std")
+except Exception as e:
+    st.error(f"Erreur lors du chargement du fichier Excel : {e}")
     st.stop()
 
-# Liste des modèles disponibles
-modele_list = sorted(df["MODELE"].dropna().unique())
-modele = st.selectbox("🛠️ Choisir un modèle", modele_list)
+# Vérification des colonnes
+required_columns = ["Modele", "C_Cabine", "C_Chassis", "C_Caisse", "M_moteur", "C_Groupe frigo", "C_Hayon elevateur"]
+if not all(col in df.columns for col in required_columns):
+    st.error("Colonnes manquantes dans le fichier Excel: " + ", ".join(required_columns))
+    st.stop()
 
-# Filtrer les lignes qui correspondent au modèle choisi
-filtered_df = df[df["MODELE"] == modele]
+# Menus déroulants intelligents
+modele = st.selectbox("🔧 Choisir un modèle", sorted(df["Modele"].dropna().unique()))
+df_filtered = df[df["Modele"] == modele]
 
-# Si plusieurs lignes existent, prendre la première
-selected_row = filtered_df.iloc[0]
+code_cabine = st.selectbox("🚗 Choisir une cabine", df_filtered["C_Cabine"].dropna().unique())
+code_chassis = st.selectbox("🛏️ Choisir un châssis", df_filtered["C_Chassis"].dropna().unique())
+code_caisse = st.selectbox("🛋️ Choisir une caisse", df_filtered["C_Caisse"].dropna().unique())
+code_moteur = st.selectbox("🚗 Choisir un moteur", df_filtered["M_moteur"].dropna().unique())
+code_frigo = st.selectbox("🌬️ Choisir un groupe frigo", df_filtered["C_Groupe frigo"].dropna().unique())
+code_hayon = st.selectbox("\U0001f69a Choisir un hayon", df_filtered["C_Hayon elevateur"].dropna().unique())
 
-# Menus déroulants basés sur le modèle sélectionné
-code_cabine = st.selectbox("🚐 Choisir une cabine", filtered_df["CABINE"].dropna().unique())
-code_chassis = st.selectbox("🛞 Choisir un châssis", filtered_df["CHASSIS"].dropna().unique())
-code_caisse = st.selectbox("🚚 Choisir une caisse", filtered_df["CAISSE"].dropna().unique())
-code_moteur = st.selectbox("⚙️ Choisir un moteur", filtered_df["MOTEUR"].dropna().unique())
-code_frigo = st.selectbox("❄️ Choisir un groupe frigo", filtered_df["FRIGO"].dropna().unique())
-code_hayon = st.selectbox("🔧 Choisir un hayon", filtered_df["HAYON"].dropna().unique() if filtered_df["HAYON"].notna().any() else ["Aucun"])
-
-# Génération du fichier Excel
-def generate_excel(data):
+# Génération de la fiche technique
+def generate_excel():
     wb = Workbook()
     ws = wb.active
     ws.title = "Fiche Technique"
+    
+    # Logo
+    logo_path = "petit_forestier_logo_officiel.png"
+    logo = XLImage(logo_path)
+    logo.width = 100
+    logo.height = 40
+    ws.add_image(logo, "A1")
 
-    ws.append(["Élément", "Code sélectionné"])
-    for key, value in data.items():
-        ws.append([key, value])
+    # Titres
+    ws.append(["Fiche Technique"])
+    ws.append([""])
+    ws.append(["Modèle", modele])
+    ws.append(["Cabine", code_cabine])
+    ws.append(["Châssis", code_chassis])
+    ws.append(["Caisse", code_caisse])
+    ws.append(["Moteur", code_moteur])
+    ws.append(["Groupe Frigo", code_frigo])
+    ws.append(["Hayon", code_hayon])
 
-    buffer = BytesIO()
-    wb.save(buffer)
-    buffer.seek(0)
-    return buffer
+    output = BytesIO()
+    wb.save(output)
+    return output
 
-# Bouton de génération
 if st.button("📄 Générer la fiche technique"):
-    data = {
-        "Modèle": modele,
-        "Cabine": code_cabine,
-        "Châssis": code_chassis,
-        "Caisse": code_caisse,
-        "Moteur": code_moteur,
-        "Frigo": code_frigo,
-        "Hayon": code_hayon,
-    }
-    excel_file = generate_excel(data)
+    excel_file = generate_excel()
     st.success("✅ Fiche technique générée avec succès !")
-    st.download_button("⬇️ Télécharger la fiche technique", data=excel_file, file_name="fiche_technique.xlsx")
+    st.download_button(label="💾 Télécharger le fichier Excel",
+                       data=excel_file.getvalue(),
+                       file_name="fiche_technique.xlsx",
+                       mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
