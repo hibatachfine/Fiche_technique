@@ -24,14 +24,15 @@ if not all(col in df.columns for col in required_columns):
     st.stop()
 
 # Menus déroulants dynamiques
+modele = st.selectbox("Choisir un modèle", sorted(df_filtered["Modele"].dropna().unique()))
+df_filtered = df_filtered[df_filtered["Modele"] == modele]
+
 marque = st.selectbox("Choisir une marque", sorted(df["Marque"].dropna().unique()))
 df_marque = df[df["Marque"] == marque]
 
 standard = st.selectbox("Choisir un standard PF", sorted(df_marque["Standard_PF"].dropna().unique()))
 df_filtered = df_marque[df_marque["Standard_PF"] == standard]
 
-modele = st.selectbox("Choisir un modèle", sorted(df_filtered["Modele"].dropna().unique()))
-df_filtered = df_filtered[df_filtered["Modele"] == modele]
 
 code_cabine = st.selectbox("Choisir une cabine", df_filtered["C_Cabine"].dropna().unique())
 code_chassis = st.selectbox("Choisir un châssis", df_filtered["C_Chassis"].dropna().unique())
