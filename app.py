@@ -17,15 +17,21 @@ except Exception as e:
     st.error(f"Erreur lors du chargement du fichier Excel : {e}")
     st.stop()
 
-# Colonnes attendues
-required_columns = ["Modele", "C_Cabine", "C_Chassis", "C_Caisse", "M_moteur", "C_Groupe frigo", "C_Hayon elevateur"]
+# Colonnes requises
+required_columns = ["Marque", "Standard_PF", "Modele", "C_Cabine", "C_Chassis", "C_Caisse", "M_moteur", "C_Groupe frigo", "C_Hayon elevateur"]
 if not all(col in df.columns for col in required_columns):
     st.error("Colonnes manquantes dans le fichier Excel: " + ", ".join(required_columns))
     st.stop()
 
-# Sélections
-modele = st.selectbox("Choisir un modèle", sorted(df["Modele"].dropna().unique()))
-df_filtered = df[df["Modele"] == modele]
+# Menus déroulants dynamiques
+marque = st.selectbox("Choisir une marque", sorted(df["Marque"].dropna().unique()))
+df_marque = df[df["Marque"] == marque]
+
+standard = st.selectbox("Choisir un standard PF", sorted(df_marque["Standard_PF"].dropna().unique()))
+df_filtered = df_marque[df_marque["Standard_PF"] == standard]
+
+modele = st.selectbox("Choisir un modèle", sorted(df_filtered["Modele"].dropna().unique()))
+df_filtered = df_filtered[df_filtered["Modele"] == modele]
 
 code_cabine = st.selectbox("Choisir une cabine", df_filtered["C_Cabine"].dropna().unique())
 code_chassis = st.selectbox("Choisir un châssis", df_filtered["C_Chassis"].dropna().unique())
@@ -34,7 +40,7 @@ code_moteur = st.selectbox("Choisir un moteur", df_filtered["M_moteur"].dropna()
 code_frigo = st.selectbox("Choisir un groupe frigo", df_filtered["C_Groupe frigo"].dropna().unique())
 code_hayon = st.selectbox("Choisir un hayon", df_filtered["C_Hayon elevateur"].dropna().unique())
 
-# Fonction pour extraire les détails à partir du code
+# Fonction pour afficher les détails par code
 def get_details_by_code(code):
     if pd.isna(code):
         return "Détails indisponibles"
@@ -43,7 +49,7 @@ def get_details_by_code(code):
         return "Détails introuvables"
     return str(rows.iloc[0].to_dict())
 
-# Génération du fichier Excel
+# Génération de l'Excel
 def generate_excel():
     wb = Workbook()
     ws = wb.active
@@ -59,6 +65,8 @@ def generate_excel():
     # Contenu
     ws.append(["Fiche Technique"])
     ws.append([""])
+    ws.append(["Marque", marque])
+    ws.append(["Standard PF", standard])
     ws.append(["Modèle", modele])
     ws.append(["Cabine", code_cabine])
     ws.append(["Détail cabine", get_details_by_code(code_cabine)])
@@ -73,12 +81,11 @@ def generate_excel():
     ws.append(["Hayon", code_hayon])
     ws.append(["Détail hayon", get_details_by_code(code_hayon)])
 
-    # Export
     output = BytesIO()
     wb.save(output)
     return output
 
-# Bouton
+# Bouton d'export
 if st.button("📄 Générer la fiche technique"):
     excel_file = generate_excel()
     st.success("✅ Fiche technique générée avec succès !")
@@ -86,3 +93,4 @@ if st.button("📄 Générer la fiche technique"):
                        data=excel_file.getvalue(),
                        file_name="fiche_technique.xlsx",
                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
