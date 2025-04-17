@@ -3,7 +3,6 @@ import streamlit as st
 import pandas as pd
 from io import BytesIO
 from openpyxl import load_workbook
-from openpyxl.writer.excel import save_virtual_workbook
 from openpyxl.drawing.image import Image
 
 # Chargement des données
