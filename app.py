@@ -7,7 +7,7 @@ from PIL import Image
 
 # Titre et logo
 st.image("petit_forestier_logo_officiel.png", width=700)
-st.markdown("<h1 style='color:#057A20;'>Générateur de Fiche Technique</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='color:#057A20;'>Générateur de Fiches Techniques</h1>", unsafe_allow_html=True)
 st.markdown("---")
 
 # Chargement des données
@@ -32,7 +32,7 @@ code_chassis = st.selectbox("Choisir un châssis", df_filtered["C_Chassis"].drop
 code_caisse = st.selectbox("Choisir une caisse", df_filtered["C_Caisse"].dropna().unique())
 code_moteur = st.selectbox("Choisir un moteur", df_filtered["M_moteur"].dropna().unique())
 code_frigo = st.selectbox("Choisir un groupe frigo", df_filtered["C_Groupe frigo"].dropna().unique())
-code_hayon = st.selectbox("\U0001f69a Choisir un hayon", df_filtered["C_Hayon elevateur"].dropna().unique())
+code_hayon = st.selectbox("Choisir un hayon", df_filtered["C_Hayon elevateur"].dropna().unique())
 
 # Génération de la fiche technique
 def generate_excel():
