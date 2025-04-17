@@ -16,8 +16,6 @@ st.markdown("<hr>", unsafe_allow_html=True)
 # Charger les données
 df = pd.read_excel("bdd_ht.xlsx", sheet_name=0)
 
-# Nettoyer les noms de colonnes
-df.columns = df.columns.str.strip().str.upper()
 
 # Vérifier que les colonnes essentielles existent
 required_columns = ["MODELE", "CABINE", "CHASSIS", "CAISSE", "MOTEUR", "FRIGO", "HAYON"]
