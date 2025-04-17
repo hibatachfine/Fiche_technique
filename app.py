@@ -23,7 +23,7 @@ def load_data():
 
 df_main, composants = load_data()
 
-st.subheader("🔍 Sélectionnez les composants")
+st.subheader(" Sélectionnez les composants")
 modeles = df_main["Modele"].dropna().unique()
 modele_select = st.selectbox("Modèle :", modeles)
 
@@ -48,7 +48,7 @@ def write_details(ws, df, code, title, start_row):
     return start_row + 4
 
 st.markdown("---")
-if st.button("✅ Générer la fiche technique"):
+if st.button(" Générer la fiche technique"):
     wb = Workbook()
     ws = wb.active
     ws.title = "Fiche Technique"
