@@ -6,7 +6,7 @@ from openpyxl.drawing.image import Image as XLImage
 from PIL import Image
 
 # Titre et logo
-st.image("petit_forestier_logo_officiel.png", width=120)
+st.image("petit_forestier_logo_officiel.png", width=500)
 st.markdown("<h1 style='color:#057A20;'>Générateur de Fiche Technique</h1>", unsafe_allow_html=True)
 st.markdown("---")
 
@@ -27,11 +27,11 @@ if not all(col in df.columns for col in required_columns):
 modele = st.selectbox("🔧 Choisir un modèle", sorted(df["Modele"].dropna().unique()))
 df_filtered = df[df["Modele"] == modele]
 
-code_cabine = st.selectbox("🚗 Choisir une cabine", df_filtered["C_Cabine"].dropna().unique())
-code_chassis = st.selectbox("🛏️ Choisir un châssis", df_filtered["C_Chassis"].dropna().unique())
-code_caisse = st.selectbox("🛋️ Choisir une caisse", df_filtered["C_Caisse"].dropna().unique())
-code_moteur = st.selectbox("🚗 Choisir un moteur", df_filtered["M_moteur"].dropna().unique())
-code_frigo = st.selectbox("🌬️ Choisir un groupe frigo", df_filtered["C_Groupe frigo"].dropna().unique())
+code_cabine = st.selectbox("Choisir une cabine", df_filtered["C_Cabine"].dropna().unique())
+code_chassis = st.selectbox("Choisir un châssis", df_filtered["C_Chassis"].dropna().unique())
+code_caisse = st.selectbox("Choisir une caisse", df_filtered["C_Caisse"].dropna().unique())
+code_moteur = st.selectbox("Choisir un moteur", df_filtered["M_moteur"].dropna().unique())
+code_frigo = st.selectbox("Choisir un groupe frigo", df_filtered["C_Groupe frigo"].dropna().unique())
 code_hayon = st.selectbox("\U0001f69a Choisir un hayon", df_filtered["C_Hayon elevateur"].dropna().unique())
 
 # Génération de la fiche technique
