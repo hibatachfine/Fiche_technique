@@ -4,7 +4,7 @@ from io import BytesIO
 from openpyxl import Workbook
 
 st.set_page_config(page_title="Fiche Technique", layout="centered")
-st.image("petit_forestier_logo_officiel.png", width=300, layout="centered")
+st.image("petit_forestier_logo_officiel.png", width=300)
 
 st.title("Générateur de Fiche Technique")
 
