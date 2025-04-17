@@ -79,4 +79,3 @@ if st.button("Générer la fiche technique"):
         file_name=f"Fiche_{modele_select}.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-
