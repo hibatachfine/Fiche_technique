@@ -10,20 +10,18 @@ st.image("petit_forestier_logo_officiel.png", width=700)
 st.markdown("<h1 style='color:#057A20;'>Générateur de Fiches Techniques</h1>", unsafe_allow_html=True)
 st.markdown("---")
 
-# Chargement des données
 try:
     df = pd.read_excel("bdd_ht.xlsx", sheet_name="FS_referentiel_produits_std")
 except Exception as e:
     st.error(f"Erreur lors du chargement du fichier Excel : {e}")
     st.stop()
 
-# Colonnes requises
 required_columns = ["Code_Pays", "Marque", "Modele", "Code_PF", "Standard_PF", "C_Cabine", "M_Moteur", "C_Chassis", "C_Caisse", "C_Groupe Frigorifique", "C_Hayon"]
 if not all(col in df.columns for col in required_columns):
     st.error("Colonnes manquantes dans le fichier Excel: " + ", ".join(required_columns))
     st.stop()
 
-# --------- Menus déroulants dans le bon ordre ---------
+# Menus déroulants dans l'ordre
 
 # 1. Code_Pays
 code_pays = st.selectbox("Choisir un code pays", sorted(df["Code_Pays"].dropna().unique()))
@@ -33,11 +31,11 @@ df_filtered = df[df["Code_Pays"] == code_pays]
 marque = st.selectbox("Choisir une marque", sorted(df_filtered["Marque"].dropna().unique()))
 df_filtered = df_filtered[df_filtered["Marque"] == marque]
 
-# 3. Modèle (filtré par code pays + marque)
+# 3. Modèle (filtré par code pays/marque)
 modele = st.selectbox("Choisir un modèle", sorted(df_filtered["Modele"].dropna().unique()))
 df_filtered = df_filtered[df_filtered["Modele"] == modele]
 
-# 4. Code_PF (filtré par code pays + marque + modèle)
+# 4. Code_PF (filtré par code pays/marque/modèle)
 code_pf = st.selectbox("Choisir un Code PF", sorted(df_filtered["Code_PF"].dropna().unique()))
 df_filtered = df_filtered[df_filtered["Code_PF"] == code_pf]
 
@@ -49,7 +47,7 @@ code_moteur = st.selectbox("Choisir un moteur", df_filtered["M_Moteur"].dropna()
 code_frigo = st.selectbox("Choisir un groupe frigo", df_filtered["C_Groupe Frigorifique"].dropna().unique())
 code_hayon = st.selectbox("Choisir un hayon", df_filtered["C_Hayon"].dropna().unique())
 
-# --------- Détails par code ---------
+# Details par code
 def get_details_by_code(code):
     if pd.isna(code):
         return "Détails indisponibles"
@@ -58,7 +56,7 @@ def get_details_by_code(code):
         return "Détails introuvables"
     return str(rows.iloc[0].to_dict())
 
-# --------- Génération Excel ---------
+# Generation de l'excel 
 def generate_excel():
     wb = Workbook()
     ws = wb.active
@@ -93,7 +91,7 @@ def generate_excel():
     wb.save(output)
     return output
 
-# --------- Bouton d'export ---------
+# Bouton d'export de la fiche 
 st.download_button(label="💾 Télécharger la fiche technique",
                    data=generate_excel().getvalue(),
                    file_name="fiche_technique.xlsx",
