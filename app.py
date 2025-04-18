@@ -18,24 +18,28 @@ except Exception as e:
     st.stop()
 
 # Colonnes requises
-required_columns = ["Marque", "Standard_PF", "Modele", "C_Cabine", "C_Chassis", "C_Caisse", "M_moteur", "C_Groupe frigo", "C_Hayon elevateur"]
+required_columns = ["Code_Pays", "Marque", "Code_PF", "Modele", "C_Cabine", "C_Chassis", "C_Caisse", "M_moteur", "C_Groupe frigo", "C_Hayon elevateur"]
 if not all(col in df.columns for col in required_columns):
     st.error("Colonnes manquantes dans le fichier Excel: " + ", ".join(required_columns))
     st.stop()
 
 # --------- Menus déroulants dans le bon ordre ---------
 
-# 1. Marque
-marque = st.selectbox("Choisir une marque", sorted(df["Marque"].dropna().unique()))
-df_filtered = df[df["Marque"] == marque]
+# 1. Code_Pays
+code_pays = st.selectbox("Choisir un code pays", sorted(df["Code_Pays"].dropna().unique()))
+df_filtered = df[df["Code_Pays"] == code_pays]
 
-# 2. Modèle (filtré par marque)
+# 2. Marque (filtré par code pays)
+marque = st.selectbox("Choisir une marque", sorted(df_filtered["Marque"].dropna().unique()))
+df_filtered = df_filtered[df_filtered["Marque"] == marque]
+
+# 3. Modèle (filtré par code pays + marque)
 modele = st.selectbox("Choisir un modèle", sorted(df_filtered["Modele"].dropna().unique()))
 df_filtered = df_filtered[df_filtered["Modele"] == modele]
 
-# 3. Standard PF (filtré par marque + modèle)
-standard = st.selectbox("Choisir un standard PF", sorted(df_filtered["Standard_PF"].dropna().unique()))
-df_filtered = df_filtered[df_filtered["Standard_PF"] == standard]
+# 4. Code_PF (filtré par code pays + marque + modèle)
+code_pf = st.selectbox("Choisir un Code PF", sorted(df_filtered["Code_PF"].dropna().unique()))
+df_filtered = df_filtered[df_filtered["Code_PF"] == code_pf]
 
 # Composants (après tous les filtres)
 code_cabine = st.selectbox("Choisir une cabine", df_filtered["C_Cabine"].dropna().unique())
@@ -68,9 +72,10 @@ def generate_excel():
 
     ws.append(["Fiche Technique"])
     ws.append([""])
+    ws.append(["Code Pays", code_pays])
     ws.append(["Marque", marque])
     ws.append(["Modèle", modele])
-    ws.append(["Standard PF", standard])
+    ws.append(["Code PF", code_pf])
     ws.append(["Cabine", code_cabine])
     ws.append(["Détail cabine", get_details_by_code(code_cabine)])
     ws.append(["Châssis", code_chassis])
