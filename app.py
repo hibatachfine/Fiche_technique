@@ -101,3 +101,4 @@ if st.button("📄 Générer la fiche technique"):
                        data=excel_file.getvalue(),
                        file_name="fiche_technique.xlsx",
                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
