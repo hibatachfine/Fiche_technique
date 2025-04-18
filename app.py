@@ -18,16 +18,16 @@ except Exception as e:
     st.stop()
 
 # Colonnes requises
-required_columns = ["code_Pays", "Marque", "Code_PF", "Modele", "C_Cabine", "C_Chassis", "C_Caisse", "M_moteur", "C_Groupe frigo", "C_Hayon elevateur"]
+required_columns = ["Code_Pays", "Marque", "Modele", "Code_PF", "Standard_PF", "C_Cabine", "M_moteur", "C_Chassis", "C_Caisse", "C_Groupe frigo", "C_Hayon elevateur"]
 if not all(col in df.columns for col in required_columns):
     st.error("Colonnes manquantes dans le fichier Excel: " + ", ".join(required_columns))
     st.stop()
 
 # --------- Menus déroulants dans le bon ordre ---------
 
-# 1. code_Pays
-code_pays = st.selectbox("Choisir un code pays", sorted(df["code_Pays"].dropna().unique()))
-df_filtered = df[df["code_Pays"] == code_pays]
+# 1. Code_Pays
+code_pays = st.selectbox("Choisir un code pays", sorted(df["Code_Pays"].dropna().unique()))
+df_filtered = df[df["Code_Pays"] == code_pays]
 
 # 2. Marque (filtré par code pays)
 marque = st.selectbox("Choisir une marque", sorted(df_filtered["Marque"].dropna().unique()))
@@ -101,5 +101,3 @@ if st.button("📄 Générer la fiche technique"):
                        data=excel_file.getvalue(),
                        file_name="fiche_technique.xlsx",
                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-
-
