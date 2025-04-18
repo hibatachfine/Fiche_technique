@@ -18,7 +18,7 @@ except Exception as e:
     st.stop()
 
 # Colonnes requises
-required_columns = ["code_pays", "marque", "modele", "code_pf", "standard_pf", "c_cabine", "m_moteur", "c_chassis", "c_caisse", "c_groupe_frigo", "c_hayon_elevateur"]
+required_columns = ["Code_Pays", "Marque", "Modele", "Code_PF", "Standard_PF", "C_Cabine", "M_Moteur", "C_Chassis", "C_Caisse", "C_Groupe Frigorifique", "C_Hayon"]
 if not all(col in df.columns for col in required_columns):
     st.error("Colonnes manquantes dans le fichier Excel: " + ", ".join(required_columns))
     st.stop()
@@ -26,28 +26,28 @@ if not all(col in df.columns for col in required_columns):
 # --------- Menus déroulants dans le bon ordre ---------
 
 # 1. Code_Pays
-code_pays = st.selectbox("Choisir un code pays", sorted(df["code_pays"].dropna().unique()))
-df_filtered = df[df["code_pays"] == code_pays]
+code_pays = st.selectbox("Choisir un code pays", sorted(df["Code_Pays"].dropna().unique()))
+df_filtered = df[df["Code_Pays"] == code_pays]
 
 # 2. Marque (filtré par code pays)
-marque = st.selectbox("Choisir une marque", sorted(df_filtered["marque"].dropna().unique()))
-df_filtered = df_filtered[df_filtered["marque"] == marque]
+marque = st.selectbox("Choisir une marque", sorted(df_filtered["Marque"].dropna().unique()))
+df_filtered = df_filtered[df_filtered["Marque"] == marque]
 
 # 3. Modèle (filtré par code pays + marque)
-modele = st.selectbox("Choisir un modèle", sorted(df_filtered["modele"].dropna().unique()))
-df_filtered = df_filtered[df_filtered["modele"] == modele]
+modele = st.selectbox("Choisir un modèle", sorted(df_filtered["Modele"].dropna().unique()))
+df_filtered = df_filtered[df_filtered["Modele"] == modele]
 
 # 4. Code_PF (filtré par code pays + marque + modèle)
-code_pf = st.selectbox("Choisir un Code PF", sorted(df_filtered["code_pf"].dropna().unique()))
-df_filtered = df_filtered[df_filtered["code_pf"] == code_pf]
+code_pf = st.selectbox("Choisir un Code PF", sorted(df_filtered["Code_PF"].dropna().unique()))
+df_filtered = df_filtered[df_filtered["Code_PF"] == code_pf]
 
 # Composants (après tous les filtres)
-code_cabine = st.selectbox("Choisir une cabine", df_filtered["c_cabine"].dropna().unique())
-code_chassis = st.selectbox("Choisir un châssis", df_filtered["c_chassis"].dropna().unique())
-code_caisse = st.selectbox("Choisir une caisse", df_filtered["c_caisse"].dropna().unique())
-code_moteur = st.selectbox("Choisir un moteur", df_filtered["m_moteur"].dropna().unique())
-code_frigo = st.selectbox("Choisir un groupe frigo", df_filtered["c_groupe_frigo"].dropna().unique())
-code_hayon = st.selectbox("Choisir un hayon", df_filtered["c_hayon_elevateur"].dropna().unique())
+code_cabine = st.selectbox("Choisir une cabine", df_filtered["C_Cabine"].dropna().unique())
+code_chassis = st.selectbox("Choisir un châssis", df_filtered["C_Chassis"].dropna().unique())
+code_caisse = st.selectbox("Choisir une caisse", df_filtered["C_Caisse"].dropna().unique())
+code_moteur = st.selectbox("Choisir un moteur", df_filtered["M_Moteur"].dropna().unique())
+code_frigo = st.selectbox("Choisir un groupe frigo", df_filtered["C_Groupe Frigorifique"].dropna().unique())
+code_hayon = st.selectbox("Choisir un hayon", df_filtered["C_Hayon"].dropna().unique())
 
 # --------- Détails par code ---------
 def get_details_by_code(code):
@@ -101,4 +101,5 @@ if st.button("📄 Générer la fiche technique"):
                        data=excel_file.getvalue(),
                        file_name="fiche_technique.xlsx",
                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
 
