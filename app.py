@@ -94,10 +94,9 @@ def generate_excel():
     return output
 
 # --------- Bouton d'export ---------
-#if st.button("📄 Générer la fiche technique"):
-   # excel_file = generate_excel()
-   # st.success("✅ Fiche technique générée avec succès !")
-    st.download_button(label="💾 Télécharger le fichier Excel",
+if st.button("📄 Générer la fiche technique"):
+    excel_file = generate_excel()
+    st.download_button(label="💾 Télécharger la fiche technique",
                        data=excel_file.getvalue(),
                        file_name="fiche_technique.xlsx",
                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
