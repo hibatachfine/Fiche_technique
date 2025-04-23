@@ -44,7 +44,7 @@ code_cabine = st.selectbox("Choisir une cabine", df_filtered["C_Cabine"].dropna(
 code_chassis = st.selectbox("Choisir un châssis", df_filtered["C_Chassis"].dropna().unique())
 code_caisse = st.selectbox("Choisir une caisse", df_filtered["C_Caisse"].dropna().unique())
 code_moteur = st.selectbox("Choisir un moteur", df_filtered["M_Moteur"].dropna().unique())
-code_frigo = st.selectbox("Choisir un groupe frigo", df_filtered["C_Groupe Frigorifique"].dropna().unique())
+code_frigo = st.selectbox("Choisir un groupe frigorifique", df_filtered["C_Groupe Frigorifique"].dropna().unique())
 code_hayon = st.selectbox("Choisir un hayon", df_filtered["C_Hayon"].dropna().unique())
 
 # Details par code
