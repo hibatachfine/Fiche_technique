@@ -39,15 +39,17 @@ df_filtered = df_filtered[df_filtered["Modele"] == modele]
 code_pf = st.selectbox("Choisir un Code PF", sorted(df_filtered["Code_PF"].dropna().unique()))
 df_filtered = df_filtered[df_filtered["Code_PF"] == code_pf]
 
-# Composants (après tous les filtres)
+# Composants (après tous les filtres sauf pour frigo/hayon)
 code_cabine = st.selectbox("Choisir une cabine", df_filtered["C_Cabine"].dropna().unique())
 code_chassis = st.selectbox("Choisir un châssis", df_filtered["C_Chassis"].dropna().unique())
 code_caisse = st.selectbox("Choisir une caisse", df_filtered["C_Caisse"].dropna().unique())
 code_moteur = st.selectbox("Choisir un moteur", df_filtered["M_Moteur"].dropna().unique())
-code_frigo = st.selectbox("Choisir un groupe frigorifique", df_filtered["C_Groupe Frigorifique"].dropna().unique())
-code_hayon = st.selectbox("Choisir un hayon", df_filtered["C_Hayon"].dropna().unique())
 
-# Details par code
+# Frigo et hayon NON dépendants des filtres
+code_frigo = st.selectbox("Choisir un groupe frigorifique", sorted(df["C_Groupe Frigorifique"].dropna().unique()))
+code_hayon = st.selectbox("Choisir un hayon", sorted(df["C_Hayon"].dropna().unique()))
+
+# Fonction pour récupérer les détails à partir d’un code
 def get_details_by_code(code):
     if pd.isna(code):
         return "Détails indisponibles"
@@ -56,7 +58,7 @@ def get_details_by_code(code):
         return "Détails introuvables"
     return str(rows.iloc[0].to_dict())
 
-# Generation de l'excel 
+# Génération de l'excel
 def generate_excel():
     wb = Workbook()
     ws = wb.active
@@ -91,9 +93,8 @@ def generate_excel():
     wb.save(output)
     return output
 
-# Bouton d'export de la fiche 
+# Bouton d’export de la fiche
 st.download_button(label="💾 Télécharger la fiche technique",
                    data=generate_excel().getvalue(),
                    file_name="fiche_technique.xlsx",
                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-
