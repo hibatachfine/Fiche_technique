@@ -39,7 +39,7 @@ df_filtered = df_filtered[df_filtered["Modele"] == modele]
 code_pf = st.selectbox("Choisir un Code PF", sorted(df_filtered["Code_PF"].dropna().unique()))
 df_filtered = df_filtered[df_filtered["Code_PF"] == code_pf]
 
-# Composants (après tous les filtres sauf pour frigo/hayon)
+# Composants (après filtres)
 code_cabine = st.selectbox("Choisir une cabine", df_filtered["C_Cabine"].dropna().unique())
 code_chassis = st.selectbox("Choisir un châssis", df_filtered["C_Chassis"].dropna().unique())
 code_caisse = st.selectbox("Choisir une caisse", df_filtered["C_Caisse"].dropna().unique())
