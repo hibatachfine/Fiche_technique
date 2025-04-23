@@ -39,13 +39,13 @@ df_filtered = df_filtered[df_filtered["Modele"] == modele]
 code_pf = st.selectbox("Choisir un Code PF", sorted(df_filtered["Code_PF"].dropna().unique()))
 df_filtered = df_filtered[df_filtered["Code_PF"] == code_pf]
 
-# Composants (après filtres)
+# Composants (filtrés sauf frigo/hayon)
 code_cabine = st.selectbox("Choisir une cabine", df_filtered["C_Cabine"].dropna().unique())
 code_chassis = st.selectbox("Choisir un châssis", df_filtered["C_Chassis"].dropna().unique())
 code_caisse = st.selectbox("Choisir une caisse", df_filtered["C_Caisse"].dropna().unique())
 code_moteur = st.selectbox("Choisir un moteur", df_filtered["M_Moteur"].dropna().unique())
 
-# Frigo et hayon NON dépendants des filtres
+# Frigo et hayon NON dépendants des filtres (proposés depuis toute la base)
 code_frigo = st.selectbox("Choisir un groupe frigorifique", sorted(df["C_Groupe Frigorifique"].dropna().unique()))
 code_hayon = st.selectbox("Choisir un hayon", sorted(df["C_Hayon"].dropna().unique()))
 
@@ -80,21 +80,3 @@ def generate_excel():
     ws.append(["Détail cabine", get_details_by_code(code_cabine)])
     ws.append(["Châssis", code_chassis])
     ws.append(["Détail châssis", get_details_by_code(code_chassis)])
-    ws.append(["Caisse", code_caisse])
-    ws.append(["Détail caisse", get_details_by_code(code_caisse)])
-    ws.append(["Moteur", code_moteur])
-    ws.append(["Détail moteur", get_details_by_code(code_moteur)])
-    ws.append(["Groupe Frigo", code_frigo])
-    ws.append(["Détail frigo", get_details_by_code(code_frigo)])
-    ws.append(["Hayon", code_hayon])
-    ws.append(["Détail hayon", get_details_by_code(code_hayon)])
-
-    output = BytesIO()
-    wb.save(output)
-    return output
-
-# Bouton d’export de la fiche
-st.download_button(label="💾 Télécharger la fiche technique",
-                   data=generate_excel().getvalue(),
-                   file_name="fiche_technique.xlsx",
-                   mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
