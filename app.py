@@ -56,7 +56,11 @@ def get_details_by_code(code):
     rows = df[df.apply(lambda row: code in row.values, axis=1)]
     if rows.empty:
         return "Détails introuvables"
-    return str(rows.iloc[0].to_dict())
+    
+    # Organiser les détails sous forme de liste
+    details = rows.iloc[0].to_dict()
+    details_list = [f"{key}: {value}" for key, value in details.items()]
+    return "\n".join(details_list)
 
 # --------- Génération Excel ---------
 def generate_excel():
@@ -100,4 +104,3 @@ st.download_button(label="💾 Télécharger la fiche technique",
                    data=generate_excel().getvalue(),
                    file_name="fiche_technique.xlsx",
                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-
