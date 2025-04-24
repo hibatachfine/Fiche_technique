@@ -79,23 +79,23 @@ def generate_excel():
     ws.append(["Code PF", code_pf])
 
     # Ajouter les détails pour chaque élément
-    ws.append(["Cabine", code_cabine])
-    ws.append(["Détails cabine", get_details_from_file("CABINES.xlsx", code_cabine)])
+    ws.append(["Cabine", C_Cabine])
+    ws.append(["Détails cabine", get_details_from_file("CABINES.xlsx", C_Cabine)])
 
-    ws.append(["Châssis", code_chassis])
-    ws.append(["Détails châssis", get_details_from_file("CHASSIS.xlsx", code_chassis)])
+    ws.append(["Châssis", C_Chassis])
+    ws.append(["Détails châssis", get_details_from_file("CHASSIS.xlsx", C_Chassis)])
 
-    ws.append(["Caisse", code_caisse])
-    ws.append(["Détails caisse", get_details_from_file("CAISSES.xlsx", code_caisse)])
+    ws.append(["Caisse", C_Caisse])
+    ws.append(["Détails caisse", get_details_from_file("CAISSES.xlsx", C_Caisse)])
 
-    ws.append(["Moteur", code_moteur])
-    ws.append(["Détails moteur", get_details_from_file("MOTEURS.xlsx", code_moteur)])
+    ws.append(["Moteur", M_moteur])
+    ws.append(["Détails moteur", get_details_from_file("MOTEURS.xlsx", M_moteur)])
 
-    ws.append(["Groupe Frigo", code_frigo])
-    ws.append(["Détails frigo", get_details_from_file("FRIGO.xlsx", code_frigo)])
+    ws.append(["Groupe Frigo", cC_Groupe Frigorifique])
+    ws.append(["Détails frigo", get_details_from_file("FRIGO.xlsx", C_Groupe Frigorifique)])
 
-    ws.append(["Hayon", code_hayon])
-    ws.append(["Détails hayon", get_details_from_file("HAYONS.xlsx", code_hayon)])
+    ws.append(["Hayon", C_Hayon])
+    ws.append(["Détails hayon", get_details_from_file("HAYONS.xlsx", C_Hayon)])
 
     output = BytesIO()
     wb.save(output)
