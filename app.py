@@ -10,7 +10,7 @@ st.image("petit_forestier_logo_officiel.png", width=700)
 st.markdown("<h1 style='color:#057A20;'>Générateur de Fiches Techniques</h1>", unsafe_allow_html=True)
 st.markdown("---")
 
-# Chargement des données
+# Chargement des données de base
 try:
     df = pd.read_excel("bdd_ht.xlsx", sheet_name="FS_referentiel_produits_std")
 except Exception as e:
@@ -49,18 +49,16 @@ code_moteur = st.selectbox("Choisir un moteur", df_filtered["M_Moteur"].dropna()
 code_frigo = st.selectbox("Choisir un groupe frigorifique", df_filtered["C_Groupe Frigorifique"].dropna().unique())
 code_hayon = st.selectbox("Choisir un hayon", df_filtered["C_Hayon"].dropna().unique())
 
-# --------- Détails par code ---------
-def get_details_by_code(code):
-    if pd.isna(code):
-        return "Détails indisponibles"
-    rows = df[df.apply(lambda row: code in row.values, axis=1)]
-    if rows.empty:
-        return "Détails introuvables"
-    
-    # Organiser les détails sous forme de liste
-    details = rows.iloc[0].to_dict()
-    details_list = [f"{key}: {value}" for key, value in details.items()]
-    return "\n".join(details_list)
+# --------- Fonction pour récupérer les détails à partir des fichiers associés ---------
+def get_details_from_file(file_name, code):
+    try:
+        details_df = pd.read_excel(file_name)
+        detail_row = details_df[details_df.iloc[:, 0] == code]  # Supposons que le code est dans la première colonne
+        if detail_row.empty:
+            return "Détails introuvables"
+        return detail_row.iloc[0, 1]  # Supposons que les détails sont dans la deuxième colonne
+    except Exception as e:
+        return f"Erreur lors du chargement des détails : {e}"
 
 # --------- Génération Excel ---------
 def generate_excel():
@@ -83,17 +81,17 @@ def generate_excel():
     
     # Ajouter les détails des composants
     ws.append(["Cabine", code_cabine])
-    ws.append(["Détail cabine", get_details_by_code(code_cabine)])
+    ws.append(["Détail cabine", get_details_from_file("cabine.xlsx", code_cabine)])
     ws.append(["Châssis", code_chassis])
-    ws.append(["Détail châssis", get_details_by_code(code_chassis)])
+    ws.append(["Détail châssis", get_details_from_file("chassis.xlsx", code_chassis)])
     ws.append(["Caisse", code_caisse])
-    ws.append(["Détail caisse", get_details_by_code(code_caisse)])
+    ws.append(["Détail caisse", get_details_from_file("caisse.xlsx", code_caisse)])
     ws.append(["Moteur", code_moteur])
-    ws.append(["Détail moteur", get_details_by_code(code_moteur)])
+    ws.append(["Détail moteur", get_details_from_file("moteur.xlsx", code_moteur)])
     ws.append(["Groupe Frigo", code_frigo])
-    ws.append(["Détail frigo", get_details_by_code(code_frigo)])
+    ws.append(["Détail frigo", get_details_from_file("frigo.xlsx", code_frigo)])
     ws.append(["Hayon", code_hayon])
-    ws.append(["Détail hayon", get_details_by_code(code_hayon)])
+    ws.append(["Détail hayon", get_details_from_file("hayon.xlsx", code_hayon)])
 
     output = BytesIO()
     wb.save(output)
