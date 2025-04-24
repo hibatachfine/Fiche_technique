@@ -91,7 +91,7 @@ def generate_excel():
     ws.append(["Moteur", M_moteur])
     ws.append(["Détails moteur", get_details_from_file("MOTEURS.xlsx", M_moteur)])
 
-    ws.append(["Groupe Frigo", cC_Groupe Frigorifique])
+    ws.append(["Groupe Frigo", C_Groupe Frigorifique])
     ws.append(["Détails frigo", get_details_from_file("FRIGO.xlsx", C_Groupe Frigorifique)])
 
     ws.append(["Hayon", C_Hayon])
