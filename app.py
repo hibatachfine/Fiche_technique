@@ -17,7 +17,7 @@ from openpyxl import Workbook
 from openpyxl.drawing.image import Image as XLImage
 from PIL import Image
 
-# 🔐 Authentification par mot de passe
+#  Authentification par mot de passe
 def check_password():
     def password_entered():
         if st.session_state["password"] == "FT.petitforestier":
@@ -36,7 +36,6 @@ def check_password():
 
 check_password()
 
- 
 # Titre et logo
 
 st.image("petit_forestier_logo_officiel.png", width=700)
@@ -63,7 +62,7 @@ if not all(col in df.columns for col in required_columns):
 
     st.stop()
  
-# Menus déroulants dans l'ordre
+# Menus dér dans l'ordre
  
 # 1. Code_Pays
 
@@ -89,7 +88,7 @@ code_pf = st.selectbox("Choisir un Code PF", sorted(df_filtered["Code_PF"].dropn
 
 df_filtered = df_filtered[df_filtered["Code_PF"] == code_pf]
  
-# Composants (après tous les filtres)
+# Composants (après filtres)
 
 code_cabine = st.selectbox("Choisir une cabine", df_filtered["C_Cabine"].dropna().unique())
 
@@ -119,7 +118,7 @@ def get_details_by_code(code):
 
     return str(rows.iloc[0].to_dict())
  
-# Generation de l'excel 
+# Generation de l'excel A REVOIR
 
 def generate_excel():
 
@@ -181,7 +180,7 @@ def generate_excel():
 
     return output
  
-# Bouton d'export de la fiche 
+# Bouton export de la fiche 
 
 st.download_button(label="💾 Télécharger la fiche technique",
 
