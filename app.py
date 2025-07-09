@@ -86,36 +86,36 @@ def insert_criteria(ws, start_cell, criteria_list):
         except Exception as e:
             print(f"Erreur cellule {col_letter}{start_row + i} : {e}")
 
-# --- Génération de la FT ---
 def generate_filled_ft():
     wb = load_workbook("Modèle FT.xlsx")
-    ws = wb["TYPE_FROID"]
+    ws = wb["TYPE_FROID"]  # 🟢 Cible directement la bonne feuille
 
-    dim_row = df_filtered.iloc[0]
+    # Récupération de la ligne sélectionnée
+    selected_row = df_filtered.iloc[0]
 
-    # Infos générales
+    # --- Dimensions principales (bloc en haut à droite)
+    ws["J6"] = selected_row.get("L", "")
+    ws["J7"] = selected_row.get("Z", "")
+    ws["F6"] = selected_row.get("W int utile sur plinthe", "")
+    ws["F7"] = selected_row.get("L int utile sur plinthe", "")
+    ws["F8"] = selected_row.get("H int", "")
+    ws["J8"] = selected_row.get("Hc", "")
+    ws["J9"] = selected_row.get("F", "")
+    ws["J10"] = selected_row.get("X", "")
+
+    # --- Bloc PTAC
+    ws["H15"] = selected_row.get("PTAC", "")
+    ws["H16"] = selected_row.get("CU", "")
+    ws["H17"] = selected_row.get("Volume", "")
+    ws["H18"] = selected_row.get("palettes 800 x 1200 mm", "")
+
+    # --- Infos générales
     ws["B4"] = marque
     ws["C4"] = modele
     ws["E4"] = code_pf
     ws["G4"] = standard_pf
 
-    # Dimensions générales
-    ws["J6"] = dim_row.get("L", "")
-    ws["J7"] = dim_row.get("Z", "")
-    ws["F6"] = dim_row.get("W int utile sur plinthe", "")
-    ws["F7"] = dim_row.get("L int utile sur plinthe", "")
-    ws["F8"] = dim_row.get("H", "")
-    ws["J8"] = dim_row.get("Hc", "")
-    ws["J9"] = dim_row.get("F", "")
-    ws["J10"] = dim_row.get("X", "")
-
-    # Bloc PTAC
-    ws["H15"] = dim_row.get("PTAC", "")
-    ws["H16"] = dim_row.get("CU", "")
-    ws["H17"] = dim_row.get("Volume", "")
-    ws["H18"] = dim_row.get("palettes 800 x 1200 mm", "")
-
-    # Insertion des composants (critère par critère)
+    # --- Insertion critère sous critère (composants)
     insert_criteria(ws, "B22", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
     insert_criteria(ws, "E22", get_criteria_list(moteur_df, code_moteur, "M_moteur"))
     insert_criteria(ws, "G22", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
@@ -123,10 +123,12 @@ def generate_filled_ft():
     insert_criteria(ws, "B64", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
     insert_criteria(ws, "B73", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
 
+    # Export
     output = BytesIO()
     wb.save(output)
     output.seek(0)
     return output
+
 
 # --- Téléchargement ---
 st.download_button(
