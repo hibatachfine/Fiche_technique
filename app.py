@@ -94,17 +94,17 @@ def generate_filled_ft():
         # Récupération des dimensions depuis la ligne du code PF
     dim_row = df[df["Code_PF"] == code_pf].iloc[0]
 
-    # Écriture des dimensions dans les cellules correspondantes
-    ws["J9"] = dim_row.get("L", "")           # L
-    ws["J10"] = dim_row.get("Z", "")           # Z
-    ws["J11"] = dim_row.get("Hc", "")          # Hc
-    ws["J12"] = dim_row.get("F", "")           # F
-    ws["J13"] = dim_row.get("X", "")          # X
-
-    ws["H10"] = dim_row.get("W int utile\nsur plinthe", "")    # W int utile
-    ws["H11"] = dim_row.get("L int utile\nsur plinthe", "")    # L int utile
-    ws["H12"] = dim_row.get("H int", "")                     # H intérieure
-    ws["H13"] = dim_row.get("H Hors-Tout (+/- 20%)", "")        # H Hors Tout
+    # Remplissage des dimensions
+    sheet["J6"] = selected_row["L"]             # L
+    sheet["J7"] = selected_row["Z"]             # Z
+    sheet["F6"] = selected_row["W int utile sur plinthe"]  # W int utile sur plinthe
+    sheet["F7"] = selected_row["L int utile sur plinthe"]  # L int utile sur plinthe
+    sheet["F8"] = selected_row["H"]             # H intérieure (correspond à H = 1950 par ex)
+    sheet["J8"] = selected_row["Hc"]            # Hc
+    sheet["J9"] = selected_row["F"]             # F
+    sheet["J10"] = selected_row["X"]            # X
+    sheet["F11"] = selected_row["palettes 800 x 1200 mm"]  # Palettes
+    
 
     # Dimensions du bloc PTAC
     ws["H15"] = dim_row.get("PTAC", "")
