@@ -53,6 +53,9 @@ df_filtered = df_filtered[df_filtered["Modele"] == modele]
 code_pf = st.selectbox("Code PF", sorted(df_filtered["Code_PF"].dropna().unique()))
 df_filtered = df_filtered[df_filtered["Code_PF"] == code_pf]
 
+standard_pf = st.selectbox("Standard PF", sorted(df_filtered["Standard_PF"].dropna().unique()))
+df_filtered = df_filtered[df_filtered["Standard_PF"] == standard_pf]
+
 code_cabine = st.selectbox("Cabine", df_filtered["C_Cabine"].dropna().unique())
 code_chassis = st.selectbox("Châssis", df_filtered["C_Chassis"].dropna().unique())
 code_caisse = st.selectbox("Caisse", df_filtered["C_Caisse"].dropna().unique())
@@ -88,6 +91,7 @@ def generate_filled_ft():
     ws["B4"] = marque
     ws["C4"] = modele
     ws["G4"] = code_pf
+    ws["G4"] = 
 
     # Insertion des composants critère par critère
     insert_criteria(ws, "B22", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
