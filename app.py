@@ -87,30 +87,30 @@ def insert_criteria(ws, start_cell, criteria_list):
         except Exception as e:
             print(f"Erreur cellule {col_letter}{start_row + i} : {e}")
 
-# --- Génération de la fiche technique ---
 def generate_filled_ft():
     wb = load_workbook("Modèle FT.xlsx")
-    ws = wb.active
+    ws = wb["TYPE_FROID"]  # 🟢 Cible directement la bonne feuille FROID POUR PF
 
     # Infos générales
     ws["B4"] = marque
     ws["C4"] = modele
-    ws["G4"] = code_pf
-    ws["H4"] = standard_pf  # ✅ Insertion du Standard PF
+    ws["E4"] = code_pf
+    ws["G4"] = standard_pf
 
     # Insertion des composants critère par critère
     insert_criteria(ws, "B22", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
     insert_criteria(ws, "E22", get_criteria_list(moteur_df, code_moteur, "M_moteur"))
     insert_criteria(ws, "G22", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
-    insert_criteria(ws, "B55", get_criteria_list(caisse_df, code_caisse, "C_Caisse"))
-    insert_criteria(ws, "I50", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
-    insert_criteria(ws, "B78", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
+    insert_criteria(ws, "B54", get_criteria_list(caisse_df, code_caisse, "C_Caisse"))
+    insert_criteria(ws, "B64", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
+    insert_criteria(ws, "B73", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
 
-    # Export en mémoire
+    # Export
     output = BytesIO()
     wb.save(output)
     output.seek(0)
     return output
+
 
 # --- Téléchargement ---
 st.download_button(
