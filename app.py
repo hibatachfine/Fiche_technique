@@ -1,12 +1,9 @@
 import streamlit as st
 import pandas as pd
 from io import BytesIO
-from openpyxl import Workbook
-from openpyxl.drawing.image import Image as XLImage
-from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
-from PIL import Image
+from openpyxl import load_workbook
 
-# Authentification par mot de passe
+# Authentification simple
 def check_password():
     def password_entered():
         if st.session_state["password"] == "FT.petitforestier":
@@ -25,121 +22,110 @@ def check_password():
 
 check_password()
 
-# Titre et logo
+# Titre
 st.image("petit_forestier_logo_officiel.png", width=700)
 st.markdown("<h1 style='color:#057A20;'>Générateur de Fiches Techniques</h1>", unsafe_allow_html=True)
 st.markdown("---")
 
-try:
-    df = pd.read_excel("bdd_ht.xlsx", sheet_name="FS_referentiel_produits_std")
-except Exception as e:
-    st.error(f"Erreur lors du chargement du fichier Excel : {e}")
-    st.stop()
+# Chargement des fichiers
+df = pd.read_excel("bdd_ht.xlsx", sheet_name="FS_referentiel_produits_std")
+cabine_df = pd.read_excel("bdd_ht.xlsx", sheet_name="Cabine")
+chassis_df = pd.read_excel("bdd_ht.xlsx", sheet_name="Châssis")
+caisse_df = pd.read_excel("bdd_ht.xlsx", sheet_name="Caisse")
+moteur_df = pd.read_excel("bdd_ht.xlsx", sheet_name="Moteur")
+frigo_df = pd.read_excel("bdd_ht.xlsx", sheet_name="Groupe frigorifique")
+hayon_df = pd.read_excel("bdd_ht.xlsx", sheet_name="Hayon")
 
-required_columns = ["Code_Pays", "Marque", "Modele", "Code_PF", "Standard_PF", "C_Cabine", "M_Moteur", "C_Chassis", "C_Caisse", "C_Groupe Frigorifique", "C_Hayon"]
-if not all(col in df.columns for col in required_columns):
-    st.error("Colonnes manquantes dans le fichier Excel: " + ", ".join(required_columns))
-    st.stop()
-
-# Sélections filtrées
-code_pays = st.selectbox("Choisir un code pays", sorted(df["Code_Pays"].dropna().unique()))
+# Sélections
+code_pays = st.selectbox("Code pays", sorted(df["Code_Pays"].dropna().unique()))
 df_filtered = df[df["Code_Pays"] == code_pays]
 
-marque = st.selectbox("Choisir une marque", sorted(df_filtered["Marque"].dropna().unique()))
+marque = st.selectbox("Marque", sorted(df_filtered["Marque"].dropna().unique()))
 df_filtered = df_filtered[df_filtered["Marque"] == marque]
 
-modele = st.selectbox("Choisir un modèle", sorted(df_filtered["Modele"].dropna().unique()))
+modele = st.selectbox("Modèle", sorted(df_filtered["Modele"].dropna().unique()))
 df_filtered = df_filtered[df_filtered["Modele"] == modele]
 
-code_pf = st.selectbox("Choisir un Code PF", sorted(df_filtered["Code_PF"].dropna().unique()))
+code_pf = st.selectbox("Code PF", sorted(df_filtered["Code_PF"].dropna().unique()))
 df_filtered = df_filtered[df_filtered["Code_PF"] == code_pf]
 
-code_cabine = st.selectbox("Choisir une cabine", df_filtered["C_Cabine"].dropna().unique())
-code_chassis = st.selectbox("Choisir un châssis", df_filtered["C_Chassis"].dropna().unique())
-code_caisse = st.selectbox("Choisir une caisse", df_filtered["C_Caisse"].dropna().unique())
-code_moteur = st.selectbox("Choisir un moteur", df_filtered["M_Moteur"].dropna().unique())
-code_frigo = st.selectbox("Choisir un groupe frigorifique", df_filtered["C_Groupe Frigorifique"].dropna().unique())
-code_hayon = st.selectbox("Choisir un hayon", df_filtered["C_Hayon"].dropna().unique())
+code_cabine = st.selectbox("Cabine", df_filtered["C_Cabine"].dropna().unique())
+code_chassis = st.selectbox("Châssis", df_filtered["C_Chassis"].dropna().unique())
+code_caisse = st.selectbox("Caisse", df_filtered["C_Caisse"].dropna().unique())
+code_moteur = st.selectbox("Moteur", df_filtered["M_Moteur"].dropna().unique())
+code_frigo = st.selectbox("Groupe Frigorifique", df_filtered["C_Groupe Frigorifique"].dropna().unique())
+code_hayon = st.selectbox("Hayon", df_filtered["C_Hayon"].dropna().unique())
 
-# Détails multiples
-def get_all_details_by_code(code):
-    if pd.isna(code):
-        return "Détails indisponibles"
-    rows = df[df.apply(lambda row: code in row.values, axis=1)]
-    if rows.empty:
-        return "Détails introuvables"
-    all_matches = []
-    for _, row in rows.iterrows():
-        all_matches.append(str(row.to_dict()))
-    return "\n\n".join(all_matches)
+# Fonction pour obtenir les détails du fichier de référence
+def get_details(df_component, code, code_column="Code"):
+    if code in df_component[code_column].values:
+        row = df_component[df_component[code_column] == code].iloc[0]
+        return row.to_dict()
+    else:
+        return {}
 
-# Excel stylé
-def generate_excel():
-    wb = Workbook()
+# Générer fichier basé sur modèle
+def generate_filled_ft():
+    wb = load_workbook("Modèle FT.xlsx")
     ws = wb.active
-    ws.title = "Fiche Technique"
 
-    logo_path = "petit_forestier_logo_officiel.png"
-    logo = XLImage(logo_path)
-    logo.width = 300
-    logo.height = 40
-    ws.add_image(logo, "A1")
+    # Renseignements simples
+    ws["E8"] = code_pays
+    ws["E9"] = marque
+    ws["E10"] = modele
+    ws["E11"] = code_pf
 
-    ws.merge_cells('A3:B3')
-    cell = ws['A3']
-    cell.value = "FICHE TECHNIQUE"
-    cell.font = Font(size=14, bold=True, color="057A20")
-    cell.alignment = Alignment(horizontal="center")
+    # Cabine
+    cabine_data = get_details(cabine_df, code_cabine)
+    if cabine_data:
+        ws["E15"] = cabine_data.get("Code", "")
+        ws["E16"] = cabine_data.get("Marque", "")
+        ws["E17"] = cabine_data.get("Modèle", "")
+        ws["E18"] = cabine_data.get("Version", "")
 
-    bold_green = Font(bold=True, color="057A20")
-    wrap = Alignment(wrap_text=True, vertical="top")
-    border = Border(left=Side(style="thin"), right=Side(style="thin"), top=Side(style="thin"), bottom=Side(style="thin"))
-    fill_gray = PatternFill(start_color="F0F0F0", end_color="F0F0F0", fill_type="solid")
+    # Châssis
+    chassis_data = get_details(chassis_df, code_chassis)
+    if chassis_data:
+        ws["E21"] = chassis_data.get("Code", "")
+        ws["E22"] = chassis_data.get("PTAC", "")
+        ws["E23"] = chassis_data.get("Empattement", "")
 
-    rows = [
-        ("Code Pays", code_pays),
-        ("Marque", marque),
-        ("Modèle", modele),
-        ("Code PF", code_pf),
-        ("Cabine", code_cabine),
-        ("Détails cabine", get_all_details_by_code(code_cabine)),
-        ("Châssis", code_chassis),
-        ("Détails châssis", get_all_details_by_code(code_chassis)),
-        ("Caisse", code_caisse),
-        ("Détails caisse", get_all_details_by_code(code_caisse)),
-        ("Moteur", code_moteur),
-        ("Détails moteur", get_all_details_by_code(code_moteur)),
-        ("Groupe Frigo", code_frigo),
-        ("Détails frigo", get_all_details_by_code(code_frigo)),
-        ("Hayon", code_hayon),
-        ("Détails hayon", get_all_details_by_code(code_hayon)),
-    ]
+    # Caisse
+    caisse_data = get_details(caisse_df, code_caisse)
+    if caisse_data:
+        ws["E26"] = caisse_data.get("Code", "")
+        ws["E27"] = caisse_data.get("Longueur", "")
+        ws["E28"] = caisse_data.get("Largeur", "")
 
-    row_num = 5
-    for label, value in rows:
-        ws.cell(row=row_num, column=1, value=label).font = bold_green
-        ws.cell(row=row_num, column=2, value=value)
-        ws.cell(row=row_num, column=1).alignment = wrap
-        ws.cell(row=row_num, column=2).alignment = wrap
-        ws.cell(row=row_num, column=1).border = border
-        ws.cell(row=row_num, column=2).border = border
-        if row_num % 2 == 0:
-            ws.cell(row=row_num, column=1).fill = fill_gray
-            ws.cell(row=row_num, column=2).fill = fill_gray
-        row_num += 1
+    # Moteur
+    moteur_data = get_details(moteur_df, code_moteur)
+    if moteur_data:
+        ws["E31"] = moteur_data.get("Code", "")
+        ws["E32"] = moteur_data.get("Puissance", "")
 
-    ws.column_dimensions['A'].width = 22
-    ws.column_dimensions['B'].width = 80
+    # Frigo
+    frigo_data = get_details(frigo_df, code_frigo)
+    if frigo_data:
+        ws["E35"] = frigo_data.get("Code", "")
+        ws["E36"] = frigo_data.get("Marque", "")
+        ws["E37"] = frigo_data.get("Modèle", "")
 
+    # Hayon
+    hayon_data = get_details(hayon_df, code_hayon)
+    if hayon_data:
+        ws["E40"] = hayon_data.get("Code", "")
+        ws["E41"] = hayon_data.get("Capacité", "")
+
+    # Export
     output = BytesIO()
     wb.save(output)
     output.seek(0)
     return output
 
-# Bouton export
+# Bouton téléchargement
 st.download_button(
-    label="📀 Télécharger la fiche technique",
-    data=generate_excel().getvalue(),
-    file_name="fiche_technique.xlsx",
+    label="📥 Télécharger la fiche technique complète",
+    data=generate_filled_ft(),
+    file_name=f"FT_{code_pf}.xlsx",
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 )
