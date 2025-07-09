@@ -85,18 +85,17 @@ def generate_filled_ft():
     ws = wb.active
 
     # Infos générales
-    ws["E8"] = code_pays
-    ws["E9"] = marque
-    ws["E10"] = modele
-    ws["E11"] = code_pf
+    ws["B4"] = marque
+    ws["C4"] = modele
+    ws["G4"] = code_pf
 
     # Insertion des composants critère par critère
-    insert_criteria(ws, "E50", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
-    insert_criteria(ws, "F50", get_criteria_list(moteur_df, code_moteur, "M_moteur"))
-    insert_criteria(ws, "G50", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
-    insert_criteria(ws, "H50", get_criteria_list(caisse_df, code_caisse, "C_Caisse"))
+    insert_criteria(ws, "B22", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
+    insert_criteria(ws, "E22", get_criteria_list(moteur_df, code_moteur, "M_moteur"))
+    insert_criteria(ws, "G22", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
+    insert_criteria(ws, "B55", get_criteria_list(caisse_df, code_caisse, "C_Caisse"))
     insert_criteria(ws, "I50", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
-    insert_criteria(ws, "J50", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
+    insert_criteria(ws, "B78", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
 
     # Export en mémoire
     output = BytesIO()
