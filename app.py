@@ -3,7 +3,7 @@ import pandas as pd
 from io import BytesIO
 from openpyxl import load_workbook
 
-# Authentification simple
+# --- Authentification ---
 def check_password():
     def password_entered():
         if st.session_state["password"] == "FT.petitforestier":
@@ -22,12 +22,12 @@ def check_password():
 
 check_password()
 
-# Logo & Titre
+# --- Interface ---
 st.image("petit_forestier_logo_officiel.png", width=700)
 st.markdown("<h1 style='color:#057A20;'>Générateur de Fiches Techniques</h1>", unsafe_allow_html=True)
 st.markdown("---")
 
-# Chargement des données
+# --- Chargement des fichiers Excel ---
 try:
     df = pd.read_excel("bdd_ht.xlsx", sheet_name="FS_referentiel_produits_std")
     cabine_df = pd.read_excel("bdd_ht.xlsx", sheet_name="CABINES")
@@ -37,10 +37,10 @@ try:
     frigo_df = pd.read_excel("bdd_ht.xlsx", sheet_name="FRIGO")
     hayon_df = pd.read_excel("bdd_ht.xlsx", sheet_name="HAYONS")
 except Exception as e:
-    st.error(f"Erreur de chargement : {e}")
+    st.error(f"Erreur lors du chargement des fichiers : {e}")
     st.stop()
 
-# Filtres utilisateur
+# --- Sélection des filtres ---
 code_pays = st.selectbox("Code pays", sorted(df["Code_Pays"].dropna().unique()))
 df_filtered = df[df["Code_Pays"] == code_pays]
 
@@ -60,65 +60,65 @@ code_moteur = st.selectbox("Moteur", df_filtered["M_Moteur"].dropna().unique())
 code_frigo = st.selectbox("Groupe Frigorifique", df_filtered["C_Groupe Frigorifique"].dropna().unique())
 code_hayon = st.selectbox("Hayon", df_filtered["C_Hayon"].dropna().unique())
 
-# Extraction de données
+# --- Fonction pour extraire les données d'une feuille ---
 def get_details(df_component, code, code_column="Code"):
     if code in df_component[code_column].values:
         return df_component[df_component[code_column] == code].iloc[0].to_dict()
     return {}
 
-# Génération de la fiche technique
+# --- Génération de la fiche technique Excel ---
 def generate_filled_ft():
     wb = load_workbook("Modèle FT.xlsx")
     ws = wb.active
 
-    # Infos générales
+    # Informations générales
     ws["E8"] = code_pays
     ws["E9"] = marque
     ws["E10"] = modele
     ws["E11"] = code_pf
 
-    # Cabine
-    cabine_data = get_details(cabine_df, code_cabine)
-    ws["E15"] = cabine_data.get("Code", "")
+    # --- Cabine ---
+    cabine_data = get_details(cabine_df, code_cabine, code_column="C_Cabine")
+    ws["E15"] = cabine_data.get("C_Cabine", "")
     ws["E16"] = cabine_data.get("Marque", "")
     ws["E17"] = cabine_data.get("Modèle", "")
     ws["E18"] = cabine_data.get("Version", "")
 
-    # Châssis
-    chassis_data = get_details(chassis_df, code_chassis)
-    ws["E21"] = chassis_data.get("Code", "")
+    # --- Châssis ---
+    chassis_data = get_details(chassis_df, code_chassis, code_column="C_Chassis")
+    ws["E21"] = chassis_data.get("C_Chassis", "")
     ws["E22"] = chassis_data.get("PTAC", "")
     ws["E23"] = chassis_data.get("Empattement", "")
 
-    # Caisse
-    caisse_data = get_details(caisse_df, code_caisse)
-    ws["E26"] = caisse_data.get("Code", "")
+    # --- Caisse ---
+    caisse_data = get_details(caisse_df, code_caisse, code_column="C_Caisse")
+    ws["E26"] = caisse_data.get("C_Caisse", "")
     ws["E27"] = caisse_data.get("Longueur", "")
     ws["E28"] = caisse_data.get("Largeur", "")
 
-    # Moteur
-    moteur_data = get_details(moteur_df, code_moteur)
-    ws["E31"] = moteur_data.get("Code", "")
+    # --- Moteur ---
+    moteur_data = get_details(moteur_df, code_moteur, code_column="M_moteur")
+    ws["E31"] = moteur_data.get("M_moteur", "")
     ws["E32"] = moteur_data.get("Puissance", "")
 
-    # Frigo
-    frigo_data = get_details(frigo_df, code_frigo)
-    ws["E35"] = frigo_data.get("Code", "")
-    ws["E36"] = frigo_data.get("Marque", "")
-    ws["E37"] = frigo_data.get("Modèle", "")
+    # --- Groupe Frigorifique ---
+    frigo_data = get_details(frigo_df, code_frigo, code_column="C_Groupe Frigorifique")
+    ws["E35"] = frigo_data.get("C_Groupe Frigorifique", "")
+    ws["E36"] = frigo_data.get("Marque groupe", "")
+    ws["E37"] = frigo_data.get("Modèle groupe", "")
 
-    # Hayon
-    hayon_data = get_details(hayon_df, code_hayon)
-    ws["E40"] = hayon_data.get("Code", "")
-    ws["E41"] = hayon_data.get("Capacité", "")
+    # --- Hayon ---
+    hayon_data = get_details(hayon_df, code_hayon, code_column="C_Hayon")
+    ws["E40"] = hayon_data.get("C_Hayon", "")
+    ws["E41"] = hayon_data.get("Capacité", "") or hayon_data.get("Puissance", "")
 
-    # Export en mémoire
+    # --- Export ---
     output = BytesIO()
     wb.save(output)
     output.seek(0)
     return output
 
-# Bouton de téléchargement
+# --- Bouton de téléchargement ---
 st.download_button(
     label="📥 Télécharger la fiche technique complète",
     data=generate_filled_ft(),
