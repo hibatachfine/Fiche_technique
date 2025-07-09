@@ -3,7 +3,7 @@ import pandas as pd
 from io import BytesIO
 from openpyxl import load_workbook
 
-# Authentification simple
+# --- Authentification ---
 def check_password():
     def password_entered():
         if st.session_state["password"] == "FT.petitforestier":
@@ -22,12 +22,12 @@ def check_password():
 
 check_password()
 
-# Titre
+# --- Interface ---
 st.image("petit_forestier_logo_officiel.png", width=700)
 st.markdown("<h1 style='color:#057A20;'>Générateur de Fiches Techniques</h1>", unsafe_allow_html=True)
 st.markdown("---")
 
-# Chargement des données
+# --- Chargement des fichiers Excel ---
 try:
     df = pd.read_excel("bdd_ht.xlsx", sheet_name="FS_referentiel_produits_std")
     cabine_df = pd.read_excel("bdd_ht.xlsx", sheet_name="CABINES")
@@ -37,10 +37,10 @@ try:
     frigo_df = pd.read_excel("bdd_ht.xlsx", sheet_name="FRIGO")
     hayon_df = pd.read_excel("bdd_ht.xlsx", sheet_name="HAYONS")
 except Exception as e:
-    st.error(f"Erreur de chargement : {e}")
+    st.error(f"Erreur lors du chargement des fichiers : {e}")
     st.stop()
 
-# Sélections utilisateur
+# --- Filtres utilisateur ---
 code_pays = st.selectbox("Code pays", sorted(df["Code_Pays"].dropna().unique()))
 df_filtered = df[df["Code_Pays"] == code_pays]
 
@@ -60,7 +60,7 @@ code_moteur = st.selectbox("Moteur", df_filtered["M_Moteur"].dropna().unique())
 code_frigo = st.selectbox("Groupe Frigorifique", df_filtered["C_Groupe Frigorifique"].dropna().unique())
 code_hayon = st.selectbox("Hayon", df_filtered["C_Hayon"].dropna().unique())
 
-# Fonctions
+# --- Fonctions utilitaires ---
 def get_criteria_list(df, code, code_column):
     row = df[df[code_column] == code]
     if row.empty:
@@ -73,9 +73,13 @@ def insert_criteria(ws, start_cell, criteria_list):
     col_letter = ''.join(filter(str.isalpha, start_cell))
     start_row = int(''.join(filter(str.isdigit, start_cell)))
     for i, crit in enumerate(criteria_list):
-        ws[f"{col_letter}{start_row + i}"] = crit
+        try:
+            value = str(crit).strip() if crit is not None else ""
+            ws[f"{col_letter}{start_row + i}"] = value
+        except Exception as e:
+            print(f"Erreur cellule {col_letter}{start_row + i} : {e}")
 
-# Génération du fichier
+# --- Génération de la fiche technique ---
 def generate_filled_ft():
     wb = load_workbook("Modèle FT.xlsx")
     ws = wb.active
@@ -86,7 +90,7 @@ def generate_filled_ft():
     ws["E10"] = modele
     ws["E11"] = code_pf
 
-    # Critères sous composants
+    # Insertion des composants critère par critère
     insert_criteria(ws, "E50", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
     insert_criteria(ws, "F50", get_criteria_list(moteur_df, code_moteur, "M_moteur"))
     insert_criteria(ws, "G50", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
@@ -94,13 +98,13 @@ def generate_filled_ft():
     insert_criteria(ws, "I50", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
     insert_criteria(ws, "J50", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
 
-    # Export final
+    # Export en mémoire
     output = BytesIO()
     wb.save(output)
     output.seek(0)
     return output
 
-# Téléchargement
+# --- Téléchargement ---
 st.download_button(
     label="📥 Télécharger la fiche technique complète",
     data=generate_filled_ft(),
