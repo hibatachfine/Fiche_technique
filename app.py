@@ -91,6 +91,27 @@ def generate_filled_ft():
     wb = load_workbook("Modèle FT.xlsx")
     ws = wb["TYPE_FROID"]  # 🟢 Cible directement la bonne feuille FROID POUR PF
 
+        # Récupération des dimensions depuis la ligne du code PF
+    dim_row = df[df["Code_PF"] == code_pf].iloc[0]
+
+    # Écriture des dimensions dans les cellules correspondantes
+    ws["J9"] = dim_row.get("L", "")           # L
+    ws["J10"] = dim_row.get("Z", "")           # Z
+    ws["J11"] = dim_row.get("Hc", "")          # Hc
+    ws["J12"] = dim_row.get("F", "")           # F
+    ws["J13"] = dim_row.get("X", "")          # X
+
+    ws["H10"] = dim_row.get("W int utile\nsur plinthe", "")    # W int utile
+    ws["H11"] = dim_row.get("L int utile\nsur plinthe", "")    # L int utile
+    ws["H12"] = dim_row.get("H int", ""))                      # H intérieure
+    ws["H13"] = dim_row.get("H", ""))                      # H Hors Tout
+
+    # Dimensions du bloc PTAC
+    ws["H15"] = dim_row.get("PTAC", "")
+    ws["H16"] = dim_row.get("CU", "")
+    ws["H17"] = dim_row.get("Volume", "")
+    ws["H18"] = dim_row.get("palettes 800 x\n1200 mm", "")
+
     # Infos générales
     ws["B4"] = marque
     ws["C4"] = modele
