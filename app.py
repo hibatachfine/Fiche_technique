@@ -103,7 +103,7 @@ def generate_filled_ft():
 
     ws["H10"] = dim_row.get("W int utile\nsur plinthe", "")    # W int utile
     ws["H11"] = dim_row.get("L int utile\nsur plinthe", "")    # L int utile
-    ws["H12"] = dim_row.get("H int", ""))                      # H intérieure
+    ws["H12"] = dim_row.get("H int", "")                     # H intérieure
     ws["H13"] = dim_row.get("H Hors-Tout (+/- 20%)", "")                   # H Hors Tout
 
     # Dimensions du bloc PTAC
