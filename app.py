@@ -1,77 +1,147 @@
+import streamlit as st
 import pandas as pd
+from io import BytesIO
 from openpyxl import load_workbook
-from openpyxl.styles import Alignment
-from shutil import copyfile
 
-# Charger la base principale
-df_ref = pd.read_excel("/mnt/data/bdd_ht.xlsx", sheet_name="FS_referentiel_produits_std")
+# Authentification simple
+def check_password():
+    def password_entered():
+        if st.session_state["password"] == "FT.petitforestier":
+            st.session_state["password_correct"] = True
+            del st.session_state["password"]
+        else:
+            st.session_state["password_correct"] = False
 
-# Lire chaque composant avec leur colonne de code respective
-df_cabines = pd.read_excel("/mnt/data/bdd_ht.xlsx", sheet_name="CABINES")
-df_chassis = pd.read_excel("/mnt/data/bdd_ht.xlsx", sheet_name="CHASSIS")
-df_caisses = pd.read_excel("/mnt/data/bdd_ht.xlsx", sheet_name="CAISSES")
-df_frigo = pd.read_excel("/mnt/data/bdd_ht.xlsx", sheet_name="FRIGO")
-df_hayon = pd.read_excel("/mnt/data/bdd_ht.xlsx", sheet_name="HAYONS")
-df_moteur = pd.read_excel("/mnt/data/bdd_ht.xlsx", sheet_name="MOTEURS")
+    if "password_correct" not in st.session_state:
+        st.text_input("Mot de passe", type="password", on_change=password_entered, key="password")
+        st.stop()
+    elif not st.session_state["password_correct"]:
+        st.text_input("Mot de passe", type="password", on_change=password_entered, key="password")
+        st.error("Mot de passe incorrect")
+        st.stop()
 
-# Ligne de test (ex: ligne 0)
-row = df_ref.iloc[0]
-code_pf = row["Code_PF"]
-code_pays = row["Code_Pays"]
-marque = row["Marque"]
-modele = row["Modele"]
+check_password()
 
-# Fonction pour récupérer les détails à partir du nom de colonne code
-def get_details(code, df, code_col_name):
-    if code in df[code_col_name].values:
-        data = df[df[code_col_name] == code].iloc[0].drop(code_col_name)
-        return "\n".join([f"{col}: {val}" for col, val in data.items() if pd.notna(val)])
-    return "Non trouvé"
+# Titre
+st.image("petit_forestier_logo_officiel.png", width=700)
+st.markdown("<h1 style='color:#057A20;'>Générateur de Fiches Techniques</h1>", unsafe_allow_html=True)
+st.markdown("---")
 
-# Récupération des détails avec les bons noms de colonnes
-details_cabine = get_details(row["C_Cabine"], df_cabines, "Code_Cabine")
-details_chassis = get_details(row["C_Chassis"], df_chassis, "Code_Chassis")
-details_caisse = get_details(row["C_Caisse"], df_caisses, "Code_Caisse")
-details_frigo = get_details(row["C_Groupe Frigorifique"], df_frigo, "Code_Frigorifique")
-details_hayon = get_details(row["C_Hayon"], df_hayon, "Code_Hayon")
-details_moteur = get_details(row["M_Moteur"], df_moteur, "Code_Moteur")
+# Chargement des fichiers avec noms de feuilles corrigés
+try:
+    df = pd.read_excel("bdd_ht.xlsx", sheet_name="FS_referentiel_produits_std")
+    cabine_df = pd.read_excel("bdd_ht.xlsx", sheet_name="CABINES")
+    chassis_df = pd.read_excel("bdd_ht.xlsx", sheet_name="CHASSIS")
+    caisse_df = pd.read_excel("bdd_ht.xlsx", sheet_name="CAISSES")
+    moteur_df = pd.read_excel("bdd_ht.xlsx", sheet_name="MOTEURS")
+    frigo_df = pd.read_excel("bdd_ht.xlsx", sheet_name="FRIGO")
+    hayon_df = pd.read_excel("bdd_ht.xlsx", sheet_name="HAYONS")
+except ValueError as e:
+    st.error("Une erreur est survenue lors du chargement des données. Veuillez vérifier les noms des feuilles dans le fichier Excel.")
+    st.stop()
 
-# Copier le modèle
-template_path = "/mnt/data/Modèle FT.xlsx"
-output_path = "/mnt/data/fiche_technique_remplie.xlsx"
-copyfile(template_path, output_path)
+# Sélections
+code_pays = st.selectbox("Code pays", sorted(df["Code_Pays"].dropna().unique()))
+df_filtered = df[df["Code_Pays"] == code_pays]
 
-# Remplissage du fichier
-wb = load_workbook(output_path)
-ws = wb.active
+marque = st.selectbox("Marque", sorted(df_filtered["Marque"].dropna().unique()))
+df_filtered = df_filtered[df_filtered["Marque"] == marque]
 
-ws["E8"] = code_pf
-ws["E9"] = code_pays
-ws["E10"] = marque
-ws["E11"] = modele
+modele = st.selectbox("Modèle", sorted(df_filtered["Modele"].dropna().unique()))
+df_filtered = df_filtered[df_filtered["Modele"] == modele]
 
-ws["E15"] = row["C_Cabine"]
-ws["F15"] = details_cabine
+code_pf = st.selectbox("Code PF", sorted(df_filtered["Code_PF"].dropna().unique()))
+df_filtered = df_filtered[df_filtered["Code_PF"] == code_pf]
 
-ws["E16"] = row["C_Chassis"]
-ws["F16"] = details_chassis
+code_cabine = st.selectbox("Cabine", df_filtered["C_Cabine"].dropna().unique())
+code_chassis = st.selectbox("Châssis", df_filtered["C_Chassis"].dropna().unique())
+code_caisse = st.selectbox("Caisse", df_filtered["C_Caisse"].dropna().unique())
+code_moteur = st.selectbox("Moteur", df_filtered["M_Moteur"].dropna().unique())
+code_frigo = st.selectbox("Groupe Frigorifique", df_filtered["C_Groupe Frigorifique"].dropna().unique())
+code_hayon = st.selectbox("Hayon", df_filtered["C_Hayon"].dropna().unique())
 
-ws["E17"] = row["C_Caisse"]
-ws["F17"] = details_caisse
+# Fonction pour obtenir les détails du fichier de référence
+def get_details(df_component, code, code_column="Code"):
+    if code in df_component[code_column].values:
+        row = df_component[df_component[code_column] == code].iloc[0]
+        return row.to_dict()
+    else:
+        return {}
 
-ws["E18"] = row["C_Groupe Frigorifique"]
-ws["F18"] = details_frigo
+# Générer fichier basé sur modèle
+def generate_filled_ft():
+    wb = load_workbook("Modèle FT.xlsx")
+    ws = wb.active
 
-ws["E19"] = row["C_Hayon"]
-ws["F19"] = details_hayon
+    # Renseignements simples
+    ws["E8"] = code_pays
+    ws["E9"] = marque
+    ws["E10"] = modele
+    ws["E11"] = code_pf
 
-ws["E20"] = row["M_Moteur"]
-ws["F20"] = details_moteur
+    # Cabine
+    cabine_data = get_details(cabine_df, code_cabine)
+    if cabine_data:
+        ws["E15"] = cabine_data.get("Code", "")
+        ws["E16"] = cabine_data.get("Marque", "")
+        ws["E17"] = cabine_data.get("Modèle", "")
+        ws["E18"] = cabine_data.get("Version", "")
+    else:
+        ws["E15:E18"] = "Données manquantes"
 
-# Texte aligné haut et retour à la ligne
-for row in ws.iter_rows(min_row=15, max_row=20, min_col=6, max_col=6):
-    for cell in row:
-        cell.alignment = Alignment(wrap_text=True, vertical="top")
+    # Châssis
+    chassis_data = get_details(chassis_df, code_chassis)
+    if chassis_data:
+        ws["E21"] = chassis_data.get("Code", "")
+        ws["E22"] = chassis_data.get("PTAC", "")
+        ws["E23"] = chassis_data.get("Empattement", "")
+    else:
+        ws["E21:E23"] = "Données manquantes"
 
-wb.save(output_path)
-print("✅ Fiche technique remplie avec succès :", output_path)
+    # Caisse
+    caisse_data = get_details(caisse_df, code_caisse)
+    if caisse_data:
+        ws["E26"] = caisse_data.get("Code", "")
+        ws["E27"] = caisse_data.get("Longueur", "")
+        ws["E28"] = caisse_data.get("Largeur", "")
+    else:
+        ws["E26:E28"] = "Données manquantes"
+
+    # Moteur
+    moteur_data = get_details(moteur_df, code_moteur)
+    if moteur_data:
+        ws["E31"] = moteur_data.get("Code", "")
+        ws["E32"] = moteur_data.get("Puissance", "")
+    else:
+        ws["E31:E32"] = "Données manquantes"
+
+    # Frigo
+    frigo_data = get_details(frigo_df, code_frigo)
+    if frigo_data:
+        ws["E35"] = frigo_data.get("Code", "")
+        ws["E36"] = frigo_data.get("Marque", "")
+        ws["E37"] = frigo_data.get("Modèle", "")
+    else:
+        ws["E35:E37"] = "Données manquantes"
+
+    # Hayon
+    hayon_data = get_details(hayon_df, code_hayon)
+    if hayon_data:
+        ws["E40"] = hayon_data.get("Code", "")
+        ws["E41"] = hayon_data.get("Capacité", "")
+    else:
+        ws["E40:E41"] = "Données manquantes"
+
+    # Export
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+    return output
+
+# Bouton téléchargement
+st.download_button(
+    label="📥 Télécharger la fiche technique complète",
+    data=generate_filled_ft(),
+    file_name=f"FT_{code_pf}.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
