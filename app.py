@@ -60,10 +60,8 @@ code_hayon = st.selectbox("Hayon", df_filtered["C_Hayon"].dropna().unique())
 def get_details(df_component, code, code_column="Code"):
     if code in df_component[code_column].values:
         row = df_component[df_component[code_column] == code].iloc[0]
-        print(f"Détails trouvés pour {code}: {row.to_dict()}")  # Débug
         return row.to_dict()
     else:
-        print(f"Aucun détail trouvé pour {code}")  # Débug
         return {}
 
 # Générer fichier basé sur modèle
@@ -80,53 +78,53 @@ def generate_filled_ft():
     # Cabine
     cabine_data = get_details(cabine_df, code_cabine)
     if cabine_data:
-        ws["E15"] = cabine_data.get("Code", "Non spécifié")
-        ws["E16"] = cabine_data.get("Marque", "Non spécifié")
-        ws["E17"] = cabine_data.get("Modèle", "Non spécifié")
-        ws["E18"] = cabine_data.get("Version", "Non spécifié")
+        ws["E15"] = cabine_data.get("Code", "")
+        ws["E16"] = cabine_data.get("Marque", "")
+        ws["E17"] = cabine_data.get("Modèle", "")
+        ws["E18"] = cabine_data.get("Version", "")
     else:
         ws["E15:E18"] = "Données manquantes"
 
     # Châssis
     chassis_data = get_details(chassis_df, code_chassis)
     if chassis_data:
-        ws["E21"] = chassis_data.get("Code", "Non spécifié")
-        ws["E22"] = chassis_data.get("PTAC", "Non spécifié")
-        ws["E23"] = chassis_data.get("Empattement", "Non spécifié")
+        ws["E21"] = chassis_data.get("Code", "")
+        ws["E22"] = chassis_data.get("PTAC", "")
+        ws["E23"] = chassis_data.get("Empattement", "")
     else:
         ws["E21:E23"] = "Données manquantes"
 
     # Caisse
     caisse_data = get_details(caisse_df, code_caisse)
     if caisse_data:
-        ws["E26"] = caisse_data.get("Code", "Non spécifié")
-        ws["E27"] = caisse_data.get("Longueur", "Non spécifié")
-        ws["E28"] = caisse_data.get("Largeur", "Non spécifié")
+        ws["E26"] = caisse_data.get("Code", "")
+        ws["E27"] = caisse_data.get("Longueur", "")
+        ws["E28"] = caisse_data.get("Largeur", "")
     else:
         ws["E26:E28"] = "Données manquantes"
 
     # Moteur
     moteur_data = get_details(moteur_df, code_moteur)
     if moteur_data:
-        ws["E31"] = moteur_data.get("Code", "Non spécifié")
-        ws["E32"] = moteur_data.get("Puissance", "Non spécifié")
+        ws["E31"] = moteur_data.get("Code", "")
+        ws["E32"] = moteur_data.get("Puissance", "")
     else:
         ws["E31:E32"] = "Données manquantes"
 
     # Frigo
     frigo_data = get_details(frigo_df, code_frigo)
     if frigo_data:
-        ws["E35"] = frigo_data.get("Code", "Non spécifié")
-        ws["E36"] = frigo_data.get("Marque", "Non spécifié")
-        ws["E37"] = frigo_data.get("Modèle", "Non spécifié")
+        ws["E35"] = frigo_data.get("Code", "")
+        ws["E36"] = frigo_data.get("Marque", "")
+        ws["E37"] = frigo_data.get("Modèle", "")
     else:
         ws["E35:E37"] = "Données manquantes"
 
     # Hayon
     hayon_data = get_details(hayon_df, code_hayon)
     if hayon_data:
-        ws["E40"] = hayon_data.get("Code", "Non spécifié")
-        ws["E41"] = hayon_data.get("Capacité", "Non spécifié")
+        ws["E40"] = hayon_data.get("Code", "")
+        ws["E41"] = hayon_data.get("Capacité", "")
     else:
         ws["E40:E41"] = "Données manquantes"
 
