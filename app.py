@@ -22,12 +22,12 @@ def check_password():
 
 check_password()
 
-# --- Interface ---
+# --- Logo et titre ---
 st.image("petit_forestier_logo_officiel.png", width=700)
 st.markdown("<h1 style='color:#057A20;'>Générateur de Fiches Techniques</h1>", unsafe_allow_html=True)
 st.markdown("---")
 
-# --- Chargement des fichiers Excel ---
+# --- Chargement des fichiers ---
 try:
     df = pd.read_excel("bdd_ht.xlsx", sheet_name="FS_referentiel_produits_std")
     cabine_df = pd.read_excel("bdd_ht.xlsx", sheet_name="CABINES")
@@ -37,7 +37,7 @@ try:
     frigo_df = pd.read_excel("bdd_ht.xlsx", sheet_name="FRIGO")
     hayon_df = pd.read_excel("bdd_ht.xlsx", sheet_name="HAYONS")
 except Exception as e:
-    st.error(f"Erreur lors du chargement des fichiers : {e}")
+    st.error(f"Erreur lors du chargement : {e}")
     st.stop()
 
 # --- Filtres utilisateur ---
@@ -58,7 +58,7 @@ if "Standard_PF" in df_filtered.columns and not df_filtered["Standard_PF"].dropn
     df_filtered = df_filtered[df_filtered["Standard_PF"] == standard_pf]
 else:
     standard_pf = ""
-    st.warning("Aucune valeur Standard PF trouvée pour ce Code PF.")
+    st.warning("Aucune valeur Standard PF pour ce Code PF")
 
 code_cabine = st.selectbox("Cabine", df_filtered["C_Cabine"].dropna().unique())
 code_chassis = st.selectbox("Châssis", df_filtered["C_Chassis"].dropna().unique())
@@ -74,48 +74,50 @@ def get_criteria_list(df, code, code_column):
         return []
     row = row.iloc[0].dropna()
     exclude = [code_column, 'Produit (P) / Option (O)']
-    return [str(val).strip() for col, val in row.items() if col not in exclude and str(val).strip().lower() != 'nan' and str(val).strip() != '']
+    return [str(val).strip() for col, val in row.items() if col not in exclude and str(val).strip().lower() != 'nan']
 
 def insert_criteria(ws, start_cell, criteria_list):
-    col_letter = ''.join(filter(str.isalpha, start_cell))
-    start_row = int(''.join(filter(str.isdigit, start_cell)))
-    for i, crit in enumerate(criteria_list):
-        try:
-            value = str(crit).strip() if crit is not None else ""
-            ws[f"{col_letter}{start_row + i}"] = value
-        except Exception as e:
-            print(f"Erreur cellule {col_letter}{start_row + i} : {e}")
+    col = ''.join(filter(str.isalpha, start_cell))
+    row = int(''.join(filter(str.isdigit, start_cell)))
+    for i, item in enumerate(criteria_list):
+        ws[f"{col}{row + i}"] = item
 
+# --- Génération fiche technique ---
 def generate_filled_ft():
     wb = load_workbook("Modèle FT.xlsx")
-    ws = wb["TYPE_FROID"]  # Feuille cible
+    ws = wb["TYPE_FROID"]
+    row = df[df["Code_PF"] == code_pf].iloc[0]
 
-    selected_row = df[(df["Code_PF"] == code_pf) & (df["Standard_PF"] == standard_pf)].iloc[0]
+    # Correction des noms de colonnes avec \n ou espaces
+    rename_dict = {
+        "W int utile sur plinthe": "W int utile sur plinthe",
+        "L int utile sur plinthe": "L int utile sur plinthe",
+        "H intérieure": "H",
+        "H Hors-Tout (+/- 20%)": "X",
+        "palettes 800 x 1200 mm": "palettes 800 x 1200 mm",
+    }
+    row = row.rename(rename_dict)
 
-    # Mapping des valeurs
-    ws["J6"] = selected_row.get("L", "")
-    ws["J7"] = selected_row.get("Z", "")
-    ws["F6"] = selected_row.get("W int\n utile \nsur plinthe", "")
-    ws["F7"] = selected_row.get("L int \nutile \nsur plinthe", "")
-    ws["F8"] = selected_row.get("H", "")
-    ws["J8"] = selected_row.get("Hc", "")
-    ws["J9"] = selected_row.get("F", "")
-    ws["J10"] = selected_row.get("X", "")
-    ws["F11"] = selected_row.get("palettes 800 x 1200 mm", "")
+    ws["J6"] = row.get("L", "")
+    ws["J7"] = row.get("Z", "")
+    ws["F6"] = row.get("W int utile sur plinthe", "")
+    ws["F7"] = row.get("L int utile sur plinthe", "")
+    ws["F8"] = row.get("H", "")
+    ws["J8"] = row.get("Hc", "")
+    ws["J9"] = row.get("F", "")
+    ws["J10"] = row.get("X", "")
+    ws["F11"] = row.get("palettes 800 x 1200 mm", "")
 
-    # Bloc PTAC
-    ws["H15"] = selected_row.get("PTAC", "")
-    ws["H16"] = selected_row.get("CU", "")
-    ws["H17"] = selected_row.get("Volume", "")
-    ws["H18"] = selected_row.get("palettes 800 x 1200 mm", "")
+    ws["H15"] = row.get("PTAC", "")
+    ws["H16"] = row.get("CU", "")
+    ws["H17"] = row.get("Volume", "")
+    ws["H18"] = row.get("palettes 800 x 1200 mm", "")
 
-    # Infos générales
     ws["B4"] = marque
     ws["C4"] = modele
     ws["E4"] = code_pf
     ws["G4"] = standard_pf
 
-    # Insertion des composants
     insert_criteria(ws, "B22", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
     insert_criteria(ws, "E22", get_criteria_list(moteur_df, code_moteur, "M_moteur"))
     insert_criteria(ws, "G22", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
@@ -123,18 +125,12 @@ def generate_filled_ft():
     insert_criteria(ws, "B64", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
     insert_criteria(ws, "B73", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
 
-    # Export
     output = BytesIO()
     wb.save(output)
     output.seek(0)
     return output
 
-df = pd.read_excel("bdd_ht.xlsx", sheet_name="FS_referentiel_produits_std")
-df.columns = df.columns.str.replace('\n', ' ', regex=False)  # 🔁 Nettoie les noms de colonnes
-
-
-
-# --- Téléchargement ---
+# --- Bouton de téléchargement ---
 st.download_button(
     label="Télécharger la fiche technique",
     data=generate_filled_ft(),
