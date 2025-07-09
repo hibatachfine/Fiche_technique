@@ -129,6 +129,10 @@ def generate_filled_ft():
     output.seek(0)
     return output
 
+df = pd.read_excel("bdd_ht.xlsx", sheet_name="FS_referentiel_produits_std")
+df.columns = df.columns.str.replace('\n', ' ', regex=False)  # 🔁 Nettoie les noms de colonnes
+
+
 
 # --- Téléchargement ---
 st.download_button(
