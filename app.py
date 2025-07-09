@@ -29,12 +29,12 @@ st.markdown("---")
 
 # Chargement des fichiers
 df = pd.read_excel("bdd_ht.xlsx", sheet_name="FS_referentiel_produits_std")
-cabine_df = pd.read_excel("bdd_ht.xlsx", sheet_name="Cabine")
-chassis_df = pd.read_excel("bdd_ht.xlsx", sheet_name="Châssis")
-caisse_df = pd.read_excel("bdd_ht.xlsx", sheet_name="Caisse")
-moteur_df = pd.read_excel("bdd_ht.xlsx", sheet_name="Moteur")
-frigo_df = pd.read_excel("bdd_ht.xlsx", sheet_name="Groupe frigorifique")
-hayon_df = pd.read_excel("bdd_ht.xlsx", sheet_name="Hayon")
+cabine_df = pd.read_excel("bdd_ht.xlsx", sheet_name="CABINES")
+chassis_df = pd.read_excel("bdd_ht.xlsx", sheet_name="CHASSIS")
+caisse_df = pd.read_excel("bdd_ht.xlsx", sheet_name="CAISSES")
+moteur_df = pd.read_excel("bdd_ht.xlsx", sheet_name="MOTEURS")
+frigo_df = pd.read_excel("bdd_ht.xlsx", sheet_name="FRIGO")
+hayon_df = pd.read_excel("bdd_ht.xlsx", sheet_name="HAYONS")
 
 # Sélections
 code_pays = st.selectbox("Code pays", sorted(df["Code_Pays"].dropna().unique()))
