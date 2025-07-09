@@ -53,8 +53,13 @@ df_filtered = df_filtered[df_filtered["Modele"] == modele]
 code_pf = st.selectbox("Code PF", sorted(df_filtered["Code_PF"].dropna().unique()))
 df_filtered = df_filtered[df_filtered["Code_PF"] == code_pf]
 
-standard_pf = st.selectbox("Standard PF", sorted(df_filtered["Standard_PF"].dropna().unique()))
-df_filtered = df_filtered[df_filtered["Standard_PF"] == standard_pf]
+# ✅ Ajout du filtre Standard_PF s’il y a des valeurs
+if "Standard_PF" in df_filtered.columns and not df_filtered["Standard_PF"].dropna().empty:
+    standard_pf = st.selectbox("Standard PF", sorted(df_filtered["Standard_PF"].dropna().unique()))
+    df_filtered = df_filtered[df_filtered["Standard_PF"] == standard_pf]
+else:
+    standard_pf = ""
+    st.warning("Aucune valeur Standard PF trouvée pour ce Code PF.")
 
 code_cabine = st.selectbox("Cabine", df_filtered["C_Cabine"].dropna().unique())
 code_chassis = st.selectbox("Châssis", df_filtered["C_Chassis"].dropna().unique())
@@ -91,7 +96,7 @@ def generate_filled_ft():
     ws["B4"] = marque
     ws["C4"] = modele
     ws["G4"] = code_pf
-    ws["G4"] = 
+    ws["H4"] = standard_pf  # ✅ Insertion du Standard PF
 
     # Insertion des composants critère par critère
     insert_criteria(ws, "B22", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
