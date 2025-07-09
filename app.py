@@ -102,4 +102,8 @@ def generate_filled_ft():
 
 # Téléchargement
 st.download_button(
-    label="📥 Télécharge
+    label="📥 Télécharger la fiche technique complète",
+    data=generate_filled_ft(),
+    file_name=f"FT_{code_pf}.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
