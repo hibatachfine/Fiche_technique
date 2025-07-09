@@ -88,34 +88,34 @@ def insert_criteria(ws, start_cell, criteria_list):
 
 def generate_filled_ft():
     wb = load_workbook("Modèle FT.xlsx")
-    ws = wb["TYPE_FROID"]  # 🟢 Cible directement la bonne feuille
+    ws = wb["TYPE_FROID"]  # Feuille cible
 
-    # Récupération de la ligne sélectionnée
-    selected_row = df_filtered.iloc[0]
+    selected_row = df[(df["Code_PF"] == code_pf) & (df["Standard_PF"] == standard_pf)].iloc[0]
 
-    # --- Dimensions principales (bloc en haut à droite)
+    # Mapping des valeurs
     ws["J6"] = selected_row.get("L", "")
     ws["J7"] = selected_row.get("Z", "")
-    ws["F6"] = selected_row.get("W int utile sur plinthe", "")
-    ws["F7"] = selected_row.get("L int utile sur plinthe", "")
-    ws["F8"] = selected_row.get("H int", "")
+    ws["F6"] = selected_row.get("W int\n utile \nsur plinthe", "")
+    ws["F7"] = selected_row.get("L int \nutile \nsur plinthe", "")
+    ws["F8"] = selected_row.get("H", "")
     ws["J8"] = selected_row.get("Hc", "")
     ws["J9"] = selected_row.get("F", "")
     ws["J10"] = selected_row.get("X", "")
+    ws["F11"] = selected_row.get("palettes 800 x 1200 mm", "")
 
-    # --- Bloc PTAC
+    # Bloc PTAC
     ws["H15"] = selected_row.get("PTAC", "")
     ws["H16"] = selected_row.get("CU", "")
     ws["H17"] = selected_row.get("Volume", "")
     ws["H18"] = selected_row.get("palettes 800 x 1200 mm", "")
 
-    # --- Infos générales
+    # Infos générales
     ws["B4"] = marque
     ws["C4"] = modele
     ws["E4"] = code_pf
     ws["G4"] = standard_pf
 
-    # --- Insertion critère sous critère (composants)
+    # Insertion des composants
     insert_criteria(ws, "B22", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
     insert_criteria(ws, "E22", get_criteria_list(moteur_df, code_moteur, "M_moteur"))
     insert_criteria(ws, "G22", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
