@@ -112,12 +112,17 @@ def insert_criteria_dual_column(ws, start_cell_1, limit_row_1, start_cell_2, cri
 
 def safe_excel_set(ws, cell, value, label=""):
     try:
-        if pd.notna(value):
-            ws[cell] = str(value)
-        else:
-            ws[cell] = ""
+        # Vérifier si la cellule fait partie d'un bloc fusionné
+        for merged_range in ws.merged_cells.ranges:
+            if cell in merged_range:
+                cell = merged_range.coord.split(":")[0]  # première cellule fusionnée
+                break
+
+        # Écrire la valeur si elle est définie
+        ws[cell] = str(value) if pd.notna(value) else ""
     except Exception as e:
         st.error(f"Erreur cellule {cell} ({label}) : {e}")
+
 
 # --- Génération de la fiche technique ---
 def generate_filled_ft():
