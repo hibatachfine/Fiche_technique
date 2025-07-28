@@ -120,7 +120,9 @@ def generate_filled_ft():
     ws["H15"] = selected_row.get("PTAC", "")
     ws["H16"] = selected_row.get("CU", "")
     ws["H17"] = selected_row.get("Volume", "")
-    ws["H18"] = selected_row.get("palettes 800 x 1200 mm", "")
+    val = selected_row.get("palettes 800 x 1200 mm", "")
+ws["H18"] = str(val) if pd.notna(val) else ""
+
 
     # Infos générales
     ws["B4"] = marque
