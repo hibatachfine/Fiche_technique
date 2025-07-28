@@ -94,18 +94,7 @@ def insert_criteria(ws, start_cell, criteria_list):
         except Exception as e:
             print(f"Erreur cellule {cell_ref} : {e}")
 
-def generate_filled_ft():
-    wb = load_workbook("Modèle FT.xlsx")
-    ws = wb["TYPE_FROID"]
-
-    matching_rows = df[df["Code_PF"] == code_pf]
-    if matching_rows.empty:
-        st.error("Aucune ligne correspondante trouvée pour le Code PF sélectionné.")
-        st.stop()
-
-    selected_row = matching_rows.iloc[0]
-    
-    def insert_criteria_dual_column(ws, start_cell_1, limit_row_1, start_cell_2, criteria_list):
+def insert_criteria_dual_column(ws, start_cell_1, limit_row_1, start_cell_2, criteria_list):
     col1 = ''.join(filter(str.isalpha, start_cell_1))
     row1 = int(''.join(filter(str.isdigit, start_cell_1)))
     end_row1 = limit_row_1
@@ -121,49 +110,26 @@ def generate_filled_ft():
             cell_ref = f"{col2}{row2 + (i - (end_row1 - row1 + 1))}"
         ws[cell_ref] = value
 
+# --- Génération de la fiche technique ---
+def generate_filled_ft():
+    wb = load_workbook("Modèle FT.xlsx")
+    
+    if "TYPE_FROID" not in wb.sheetnames:
+        st.error("La feuille 'TYPE_FROID' est introuvable dans le fichier Excel.")
+        st.stop()
+
+    ws = wb["TYPE_FROID"]
+
+    matching_rows = df[df["Code_PF"] == code_pf]
+    if matching_rows.empty:
+        st.error("Aucune ligne correspondante trouvée pour le Code PF sélectionné.")
+        st.stop()
+
+    selected_row = matching_rows.iloc[0]
 
     # Dimensions
     ws["J5"] = str(selected_row.get("L", "")) if pd.notna(selected_row.get("L", "")) else ""
     ws["J6"] = str(selected_row.get("Z", "")) if pd.notna(selected_row.get("Z", "")) else ""
     ws["J7"] = str(selected_row.get("Hc", "")) if pd.notna(selected_row.get("Hc", "")) else ""
     ws["J8"] = str(selected_row.get("F", "")) if pd.notna(selected_row.get("F", "")) else ""
-    ws["J9"] = str(selected_row.get("X", "")) if pd.notna(selected_row.get("X", "")) else ""
-
-    ws["H6"] = str(selected_row.get("W int utile sur plinthe", "")) if pd.notna(selected_row.get("W int utile sur plinthe", "")) else ""
-    ws["H7"] = str(selected_row.get("L int utile sur plinthe", "")) if pd.notna(selected_row.get("L int utile sur plinthe", "")) else ""
-    ws["H8"] = str(selected_row.get("H", "")) if pd.notna(selected_row.get("H", "")) else ""
-    
-    # Bloc PTAC
-    ws["H11"] = str(selected_row.get("PTAC", "")) if pd.notna(selected_row.get("PTAC", "")) else ""
-    ws["H12"] = str(selected_row.get("CU", "")) if pd.notna(selected_row.get("CU", "")) else ""
-    ws["H13"] = str(selected_row.get("Volume", "")) if pd.notna(selected_row.get("Volume", "")) else ""
-    ws["H14"] = str(selected_row.get("palettes 800 x 1200 mm", "")) if pd.notna(selected_row.get("palettes 800 x 1200 mm", "")) else ""
-
-    # Infos générales
-    ws["B2"] = marque
-    ws["C2"] = modele
-    ws["E2"] = code_pf
-    ws["G2"] = standard_pf
-
-    
-    # Insertion critères
-    insert_criteria(ws, "B18", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
-    insert_criteria(ws, "E18", get_criteria_list(moteur_df, code_moteur, "M_moteur"))
-    insert_criteria(ws, "G18", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
-    insert_criteria(ws, "B46", get_criteria_list(caisse_df, code_caisse, "C_Caisse"))
-    insert_criteria_dual_column(ws, "B67", 73, "E68", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
-    insert_criteria_dual_column(ws, "B77", 82, "E77", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
-
-    # Export fichier
-    output = BytesIO()
-    wb.save(output)
-    output.seek(0)
-    return output
-
-# --- Téléchargement ---
-st.download_button(
-    label="📥 Télécharger la fiche technique",
-    data=generate_filled_ft(),
-    file_name=f"FT_{code_pf}.xlsx",
-    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-)
+    ws["J9"] = str(selected_row.get("X", ""))_
