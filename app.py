@@ -102,7 +102,7 @@ def generate_filled_ft():
 
     selected_row = df[df["Code_PF"] == code_pf].iloc[0]
 
-    # Dimensions (partie droite)
+    # Dimensions 
     ws["J6"] = selected_row.get("L", "")
     ws["J7"] = selected_row.get("Z", "")
     ws["F6"] = selected_row.get("W int utile sur plinthe", "")
