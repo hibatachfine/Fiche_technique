@@ -110,10 +110,19 @@ def insert_criteria_dual_column(ws, start_cell_1, limit_row_1, start_cell_2, cri
             cell_ref = f"{col2}{row2 + (i - (end_row1 - row1 + 1))}"
         ws[cell_ref] = value
 
+def safe_excel_set(ws, cell, value, label=""):
+    try:
+        if pd.notna(value):
+            ws[cell] = str(value)
+        else:
+            ws[cell] = ""
+    except Exception as e:
+        st.error(f"Erreur cellule {cell} ({label}) : {e}")
+
 # --- Génération de la fiche technique ---
 def generate_filled_ft():
     wb = load_workbook("Modèle FT.xlsx")
-    
+
     if "TYPE_FROID" not in wb.sheetnames:
         st.error("La feuille 'TYPE_FROID' est introuvable dans le fichier Excel.")
         st.stop()
@@ -128,21 +137,20 @@ def generate_filled_ft():
     selected_row = matching_rows.iloc[0]
 
     # Dimensions
-    ws["J5"] = str(selected_row.get("L", "")) if pd.notna(selected_row.get("L", "")) else ""
-    ws["J6"] = str(selected_row.get("Z", "")) if pd.notna(selected_row.get("Z", "")) else ""
-    ws["J7"] = str(selected_row.get("Hc", "")) if pd.notna(selected_row.get("Hc", "")) else ""
-    ws["J8"] = str(selected_row.get("F", "")) if pd.notna(selected_row.get("F", "")) else ""
-    ws["J9"] = str(selected_row.get("X", "")) if pd.notna(selected_row.get("X", "")) else ""
-
-    ws["H6"] = str(selected_row.get("W int utile sur plinthe", "")) if pd.notna(selected_row.get("W int utile sur plinthe", "")) else ""
-    ws["H7"] = str(selected_row.get("L int utile sur plinthe", "")) if pd.notna(selected_row.get("L int utile sur plinthe", "")) else ""
-    ws["H8"] = str(selected_row.get("H", "")) if pd.notna(selected_row.get("H", "")) else ""
+    safe_excel_set(ws, "J5", selected_row.get("L", ""), "L")
+    safe_excel_set(ws, "J6", selected_row.get("Z", ""), "Z")
+    safe_excel_set(ws, "J7", selected_row.get("Hc", ""), "Hc")
+    safe_excel_set(ws, "J8", selected_row.get("F", ""), "F")
+    safe_excel_set(ws, "J9", selected_row.get("X", ""), "X")
+    safe_excel_set(ws, "H6", selected_row.get("W int utile sur plinthe", ""), "W utile")
+    safe_excel_set(ws, "H7", selected_row.get("L int utile sur plinthe", ""), "L utile")
+    safe_excel_set(ws, "H8", selected_row.get("H", ""), "H")
 
     # Bloc PTAC
-    ws["H11"] = str(selected_row.get("PTAC", "")) if pd.notna(selected_row.get("PTAC", "")) else ""
-    ws["H12"] = str(selected_row.get("CU", "")) if pd.notna(selected_row.get("CU", "")) else ""
-    ws["H13"] = str(selected_row.get("Volume", "")) if pd.notna(selected_row.get("Volume", "")) else ""
-    ws["H14"] = str(selected_row.get("palettes 800 x 1200 mm", "")) if pd.notna(selected_row.get("palettes 800 x 1200 mm", "")) else ""
+    safe_excel_set(ws, "H11", selected_row.get("PTAC", ""), "PTAC")
+    safe_excel_set(ws, "H12", selected_row.get("CU", ""), "CU")
+    safe_excel_set(ws, "H13", selected_row.get("Volume", ""), "Volume")
+    safe_excel_set(ws, "H14", selected_row.get("palettes 800 x 1200 mm", ""), "Palettes")
 
     # Infos générales
     ws["B2"] = marque
@@ -166,9 +174,8 @@ def generate_filled_ft():
 
 # --- Téléchargement ---
 st.download_button(
-    label="📥 Télécharger la fiche technique",
+    label="📅 Télécharger la fiche technique",
     data=generate_filled_ft(),
     file_name=f"FT_{code_pf}.xlsx",
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 )
-
