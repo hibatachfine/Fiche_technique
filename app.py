@@ -137,20 +137,20 @@ def generate_filled_ft():
     selected_row = matching_rows.iloc[0]
 
     # Dimensions
-    safe_excel_set(ws, "J5", selected_row.get("L", ""), "L")
-    safe_excel_set(ws, "J6", selected_row.get("Z", ""), "Z")
-    safe_excel_set(ws, "J7", selected_row.get("Hc", ""), "Hc")
-    safe_excel_set(ws, "J8", selected_row.get("F", ""), "F")
-    safe_excel_set(ws, "J9", selected_row.get("X", ""), "X")
-    safe_excel_set(ws, "H6", selected_row.get("W int utile sur plinthe", ""), "W utile")
-    safe_excel_set(ws, "H7", selected_row.get("L int utile sur plinthe", ""), "L utile")
-    safe_excel_set(ws, "H8", selected_row.get("H", ""), "H")
+    safe_excel_set(ws, "J6", selected_row.get("L", ""), "L")
+    safe_excel_set(ws, "J7", selected_row.get("Z", ""), "Z")
+    safe_excel_set(ws, "J8", selected_row.get("Hc", ""), "Hc")
+    safe_excel_set(ws, "J9", selected_row.get("F", ""), "F")
+    safe_excel_set(ws, "J10", selected_row.get("X", ""), "X")
+    safe_excel_set(ws, "H7", selected_row.get("W int utile sur plinthe", ""), "W utile")
+    safe_excel_set(ws, "H8", selected_row.get("L int utile sur plinthe", ""), "L utile")
+    safe_excel_set(ws, "H9", selected_row.get("H", ""), "H")
 
     # Bloc PTAC
-    safe_excel_set(ws, "H11", selected_row.get("PTAC", ""), "PTAC")
-    safe_excel_set(ws, "H12", selected_row.get("CU", ""), "CU")
-    safe_excel_set(ws, "H13", selected_row.get("Volume", ""), "Volume")
-    safe_excel_set(ws, "H14", selected_row.get("palettes 800 x 1200 mm", ""), "Palettes")
+    safe_excel_set(ws, "H12", selected_row.get("PTAC", ""), "PTAC")
+    safe_excel_set(ws, "H13", selected_row.get("CU", ""), "CU")
+    safe_excel_set(ws, "H14", selected_row.get("Volume", ""), "Volume")
+    safe_excel_set(ws, "H15", selected_row.get("palettes 800 x 1200 mm", ""), "Palettes")
 
     # Infos générales
     ws["B2"] = marque
