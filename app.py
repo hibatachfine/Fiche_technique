@@ -107,21 +107,21 @@ def generate_filled_ft():
     selected_row = matching_rows.iloc[0]
 
     # Dimensions
-    ws["J6"] = selected_row.get("L", "")
-    ws["J7"] = selected_row.get("Z", "")
-    ws["F6"] = selected_row.get("W int utile sur plinthe", "")
-    ws["F7"] = selected_row.get("L int utile sur plinthe", "")
-    ws["F8"] = selected_row.get("H", "")
-    ws["J8"] = selected_row.get("Hc", "")
-    ws["J9"] = selected_row.get("F", "")
-    ws["J10"] = selected_row.get("X", "")
+ws["J6"] = str(selected_row.get("L", "")) if pd.notna(selected_row.get("L", "")) else ""
+ws["J7"] = str(selected_row.get("Z", "")) if pd.notna(selected_row.get("Z", "")) else ""
+ws["F6"] = str(selected_row.get("W int utile sur plinthe", "")) if pd.notna(selected_row.get("W int utile sur plinthe", "")) else ""
+ws["F7"] = str(selected_row.get("L int utile sur plinthe", "")) if pd.notna(selected_row.get("L int utile sur plinthe", "")) else ""
+ws["F8"] = str(selected_row.get("H", "")) if pd.notna(selected_row.get("H", "")) else ""
+ws["J8"] = str(selected_row.get("Hc", "")) if pd.notna(selected_row.get("Hc", "")) else ""
+ws["J9"] = str(selected_row.get("F", "")) if pd.notna(selected_row.get("F", "")) else ""
+ws["J10"] = str(selected_row.get("X", "")) if pd.notna(selected_row.get("X", "")) else ""
 
-    # Bloc PTAC
-    ws["H15"] = selected_row.get("PTAC", "")
-    ws["H16"] = selected_row.get("CU", "")
-    ws["H17"] = selected_row.get("Volume", "")
-    val = selected_row.get("palettes 800 x 1200 mm", "")
-ws["H18"] = str(val) if pd.notna(val) else ""
+# Bloc PTAC
+ws["H15"] = str(selected_row.get("PTAC", "")) if pd.notna(selected_row.get("PTAC", "")) else ""
+ws["H16"] = str(selected_row.get("CU", "")) if pd.notna(selected_row.get("CU", "")) else ""
+ws["H17"] = str(selected_row.get("Volume", "")) if pd.notna(selected_row.get("Volume", "")) else ""
+ws["H18"] = str(selected_row.get("palettes 800 x 1200 mm", "")) if pd.notna(selected_row.get("palettes 800 x 1200 mm", "")) else ""
+
 
 
     # Infos générales
