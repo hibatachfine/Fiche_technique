@@ -70,6 +70,14 @@ code_moteur = st.selectbox("Moteur", df_filtered["M_Moteur"].dropna().unique())
 code_frigo = st.selectbox("Groupe Frigorifique", df_filtered["C_Groupe Frigorifique"].dropna().unique())
 code_hayon = st.selectbox("Hayon", df_filtered["C_Hayon"].dropna().unique())
 
+st.write("Cabine :", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
+st.write("Moteur :", get_criteria_list(moteur_df, code_moteur, "M_moteur"))
+st.write("Châssis :", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
+st.write("Caisse :", get_criteria_list(caisse_df, code_caisse, "C_Caisse"))
+st.write("Frigo :", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
+st.write("Hayon :", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
+
+
 # --- Fonctions utilitaires ---
 def get_criteria_list(df, code, code_column):
     row = df[df[code_column] == code]
