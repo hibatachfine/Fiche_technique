@@ -40,7 +40,7 @@ except Exception as e:
     st.error(f"Erreur lors du chargement des fichiers : {e}")
     st.stop()
 
-# --- Normalisation des noms de colonnes (évite les \n) ---
+# --- Normalisation des noms de colonnes ---
 df.columns = df.columns.str.replace('\n', ' ').str.strip()
 
 # --- Filtres utilisateur ---
@@ -56,7 +56,6 @@ df_filtered = df_filtered[df_filtered["Modele"] == modele]
 code_pf = st.selectbox("Code PF", sorted(df_filtered["Code_PF"].dropna().unique()))
 df_filtered = df_filtered[df_filtered["Code_PF"] == code_pf]
 
-# Ajout du filtre Standard_PF
 if "Standard_PF" in df_filtered.columns and not df_filtered["Standard_PF"].dropna().empty:
     standard_pf = st.selectbox("Standard PF", sorted(df_filtered["Standard_PF"].dropna().unique()))
     df_filtered = df_filtered[df_filtered["Standard_PF"] == standard_pf]
@@ -100,9 +99,14 @@ def generate_filled_ft():
     wb = load_workbook("Modèle FT.xlsx")
     ws = wb["TYPE_FROID"]
 
-    selected_row = df[df["Code_PF"] == code_pf].iloc[0]
+    matching_rows = df[df["Code_PF"] == code_pf]
+    if matching_rows.empty:
+        st.error("Aucune ligne correspondante trouvée pour le Code PF sélectionné.")
+        st.stop()
 
-    # Dimensions 
+    selected_row = matching_rows.iloc[0]
+
+    # Dimensions
     ws["J6"] = selected_row.get("L", "")
     ws["J7"] = selected_row.get("Z", "")
     ws["F6"] = selected_row.get("W int utile sur plinthe", "")
@@ -140,7 +144,7 @@ def generate_filled_ft():
 
 # --- Téléchargement ---
 st.download_button(
-    label="Télécharger la fiche technique",
+    label="📥 Télécharger la fiche technique",
     data=generate_filled_ft(),
     file_name=f"FT_{code_pf}.xlsx",
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
