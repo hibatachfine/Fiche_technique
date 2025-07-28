@@ -108,30 +108,31 @@ def generate_filled_ft():
     # Dimensions
     ws["J6"] = str(selected_row.get("L", "")) if pd.notna(selected_row.get("L", "")) else ""
     ws["J7"] = str(selected_row.get("Z", "")) if pd.notna(selected_row.get("Z", "")) else ""
-    ws["F6"] = str(selected_row.get("W int utile sur plinthe", "")) if pd.notna(selected_row.get("W int utile sur plinthe", "")) else ""
-    ws["F7"] = str(selected_row.get("L int utile sur plinthe", "")) if pd.notna(selected_row.get("L int utile sur plinthe", "")) else ""
-    ws["F8"] = str(selected_row.get("H", "")) if pd.notna(selected_row.get("H", "")) else ""
     ws["J8"] = str(selected_row.get("Hc", "")) if pd.notna(selected_row.get("Hc", "")) else ""
     ws["J9"] = str(selected_row.get("F", "")) if pd.notna(selected_row.get("F", "")) else ""
     ws["J10"] = str(selected_row.get("X", "")) if pd.notna(selected_row.get("X", "")) else ""
 
+    ws["H7"] = str(selected_row.get("W int utile sur plinthe", "")) if pd.notna(selected_row.get("W int utile sur plinthe", "")) else ""
+    ws["H8"] = str(selected_row.get("L int utile sur plinthe", "")) if pd.notna(selected_row.get("L int utile sur plinthe", "")) else ""
+    ws["H9"] = str(selected_row.get("H", "")) if pd.notna(selected_row.get("H", "")) else ""
+    
     # Bloc PTAC
-    ws["H15"] = str(selected_row.get("PTAC", "")) if pd.notna(selected_row.get("PTAC", "")) else ""
-    ws["H16"] = str(selected_row.get("CU", "")) if pd.notna(selected_row.get("CU", "")) else ""
-    ws["H17"] = str(selected_row.get("Volume", "")) if pd.notna(selected_row.get("Volume", "")) else ""
-    ws["H18"] = str(selected_row.get("palettes 800 x 1200 mm", "")) if pd.notna(selected_row.get("palettes 800 x 1200 mm", "")) else ""
+    ws["H12"] = str(selected_row.get("PTAC", "")) if pd.notna(selected_row.get("PTAC", "")) else ""
+    ws["H13"] = str(selected_row.get("CU", "")) if pd.notna(selected_row.get("CU", "")) else ""
+    ws["H14"] = str(selected_row.get("Volume", "")) if pd.notna(selected_row.get("Volume", "")) else ""
+    ws["H15"] = str(selected_row.get("palettes 800 x 1200 mm", "")) if pd.notna(selected_row.get("palettes 800 x 1200 mm", "")) else ""
 
     # Infos générales
-    ws["B4"] = marque
-    ws["C4"] = modele
-    ws["E4"] = code_pf
-    ws["G4"] = standard_pf
+    ws["B2"] = marque
+    ws["C2"] = modele
+    ws["E2"] = code_pf
+    ws["G2"] = standard_pf
 
     # Insertion critères
-    insert_criteria(ws, "B22", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
-    insert_criteria(ws, "E22", get_criteria_list(moteur_df, code_moteur, "M_moteur"))
-    insert_criteria(ws, "G22", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
-    insert_criteria(ws, "B54", get_criteria_list(caisse_df, code_caisse, "C_Caisse"))
+    insert_criteria(ws, "B19", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
+    insert_criteria(ws, "E19", get_criteria_list(moteur_df, code_moteur, "M_moteur"))
+    insert_criteria(ws, "G19", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
+    insert_criteria(ws, "B47", get_criteria_list(caisse_df, code_caisse, "C_Caisse"))
     insert_criteria(ws, "B64", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
     insert_criteria(ws, "B73", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
 
