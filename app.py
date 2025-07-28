@@ -104,6 +104,23 @@ def generate_filled_ft():
         st.stop()
 
     selected_row = matching_rows.iloc[0]
+    
+    def insert_criteria_dual_column(ws, start_cell_1, limit_row_1, start_cell_2, criteria_list):
+    col1 = ''.join(filter(str.isalpha, start_cell_1))
+    row1 = int(''.join(filter(str.isdigit, start_cell_1)))
+    end_row1 = limit_row_1
+
+    col2 = ''.join(filter(str.isalpha, start_cell_2))
+    row2 = int(''.join(filter(str.isdigit, start_cell_2)))
+
+    for i, item in enumerate(criteria_list):
+        value = str(item).strip()
+        if row1 + i <= end_row1:
+            cell_ref = f"{col1}{row1 + i}"
+        else:
+            cell_ref = f"{col2}{row2 + (i - (end_row1 - row1 + 1))}"
+        ws[cell_ref] = value
+
 
     # Dimensions
     ws["J5"] = str(selected_row.get("L", "")) if pd.notna(selected_row.get("L", "")) else ""
@@ -127,23 +144,6 @@ def generate_filled_ft():
     ws["C2"] = modele
     ws["E2"] = code_pf
     ws["G2"] = standard_pf
-
-    # Insertion critères
-    def insert_criteria_dual_column(ws, start_cell_1, limit_row_1, start_cell_2, criteria_list):
-    col1 = ''.join(filter(str.isalpha, start_cell_1))
-    row1 = int(''.join(filter(str.isdigit, start_cell_1)))
-    end_row1 = limit_row_1
-
-    col2 = ''.join(filter(str.isalpha, start_cell_2))
-    row2 = int(''.join(filter(str.isdigit, start_cell_2)))
-
-    for i, item in enumerate(criteria_list):
-        value = str(item).strip()
-        if row1 + i <= end_row1:
-            cell_ref = f"{col1}{row1 + i}"
-        else:
-            cell_ref = f"{col2}{row2 + (i - (end_row1 - row1 + 1))}"
-        ws[cell_ref] = value
 
     
     # Insertion critères
