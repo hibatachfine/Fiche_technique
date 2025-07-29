@@ -113,13 +113,15 @@ def get_criteria_list(df_comp, code, code_column):
     if row.empty:
         return []
     row = row.iloc[0].dropna()
-    
+    exclude = {code_column, 'Produit (P) / Option (O)'}
     out = []
-    for val in row.values:
+    for col, val in row.items():
+        if col in exclude:
+            continue
         s = str(val).strip()
-        if s and s.upper() not in {"P", "O"} and s.lower() != "nan":
+        if s and s.lower() != "nan":
             out.append(s)
-    return out
+    return out[1:] if len(out) > 1 else []  # on saute la 1ère valeur
 
 def insert_criteria(ws, start_cell, criteria_list):
     col = ''.join(filter(str.isalpha, start_cell))
