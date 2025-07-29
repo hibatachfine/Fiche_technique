@@ -105,12 +105,13 @@ def generate_filled_ft():
     # Dimensions 
     ws["I6"] = selected_row.get("L", "")
     ws["I7"] = selected_row.get("Z", "")
-    ws["I6"] = selected_row.get("W int utile sur plinthe", "")
-    ws["G7"] = selected_row.get("L int utile sur plinthe", "")
-    ws["G8"] = selected_row.get("H", "")
-    ws["G8"] = selected_row.get("Hc", "")
+    ws["I8"] = selected_row.get("Hc", "")
     ws["I9"] = selected_row.get("F", "")
     ws["I10"] = selected_row.get("X", "")
+    ws["G7"] = selected_row.get("W int utile sur plinthe", "")
+    ws["G8"] = selected_row.get("L int utile sur plinthe", "")
+    ws["G9"] = selected_row.get("H", "")
+    
  
     # Bloc PTAC
     ws["G12"] = selected_row.get("PTAC", "")
