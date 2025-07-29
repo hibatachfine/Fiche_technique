@@ -95,44 +95,47 @@ def insert_criteria(ws, start_cell, criteria_list):
         except Exception as e:
             print(f"Erreur cellule {cell_ref} : {e}")
  
-# --- Génération de la fiche technique ---
 def generate_filled_ft():
     wb = load_workbook("Modèle FT.xlsx")
     ws = wb["TYPE_FROID"]
- 
+
     selected_row = df[df["Code_PF"] == code_pf].iloc[0]
- 
-    # Dimensions 
+
+    # Dimensions
+    ws["G6"] = selected_row.get("W int  utile  sur plinthe", "")
+    ws["G7"] = selected_row.get("L int  utile  sur plinthe", "")
+    ws["G8"] = selected_row.get("H", "")
     ws["I6"] = selected_row.get("L", "")
     ws["I7"] = selected_row.get("Z", "")
     ws["I8"] = selected_row.get("Hc", "")
     ws["I9"] = selected_row.get("F", "")
     ws["I10"] = selected_row.get("X", "")
-    ws["G7"] = selected_row.get("W int utile sur plinthe", "")
-    ws["G8"] = selected_row.get("L int utile sur plinthe", "")
-    ws["G9"] = selected_row.get("H", "")
-    
- 
+
     # Bloc PTAC
     ws["G12"] = selected_row.get("PTAC", "")
     ws["G13"] = selected_row.get("CU", "")
     ws["G14"] = selected_row.get("Volume", "")
     ws["G15"] = selected_row.get("palettes 800 x 1200 mm", "")
- 
+
     # Infos générales
     ws["B2"] = marque
     ws["C2"] = modele
     ws["D2"] = code_pf
     ws["G2"] = standard_pf
- 
-    # Insertion critères
+
+    # Insertion critères (noms de colonnes exacts)
     insert_criteria(ws, "B19", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
-    insert_criteria(ws, "E19", get_criteria_list(moteur_df, code_moteur, "M_moteur"))
+    insert_criteria(ws, "E19", get_criteria_list(moteur_df, code_moteur, "M_Moteur"))
     insert_criteria(ws, "G19", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
     insert_criteria(ws, "B38", get_criteria_list(caisse_df, code_caisse, "C_Caisse"))
     insert_criteria(ws, "B59", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
     insert_criteria(ws, "B68", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
- 
+
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+    return output
+
     # Export fichier
     output = BytesIO()
     wb.save(output)
