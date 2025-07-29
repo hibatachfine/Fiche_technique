@@ -48,7 +48,7 @@ except Exception as e:
     st.stop()
 
 # Normalisation colonnes
-df.columns       = df.columns.str.replace('\n', ' ').str.strip()
+df.columns         = df.columns.str.replace('\n', ' ').str.strip()
 cabine_df.columns  = cabine_df.columns.str.strip()
 chassis_df.columns = chassis_df.columns.str.strip()
 caisse_df.columns  = caisse_df.columns.str.strip()
@@ -89,22 +89,19 @@ code_hayon   = st.selectbox("Hayon",   df_filtered["C_Hayon"].dropna().unique())
 # Utilitaires
 # ======================
 def to_cell_value(x):
-    # remplace NaN/None par ""
     if pd.isna(x):
         return ""
     return x
 
 def safe_write(ws, cell_ref, value):
-    """Écriture robuste y compris si la cellule appartient à une zone fusionnée."""
     value = to_cell_value(value)
     col_letters = ''.join(filter(str.isalpha, cell_ref))
     row_number  = int(''.join(filter(str.isdigit, cell_ref)))
     col_index   = column_index_from_string(col_letters)
 
-    # si la cellule appartient à une zone fusionnée, écrire en haut-gauche
     for merged in ws.merged_cells.ranges:
         if cell_ref in merged:
-            min_col, min_row, _, _ = merged.bounds
+            min_col, min_row, *_ = merged.bounds
             col_index = min_col
             row_number = min_row
             break
@@ -127,59 +124,14 @@ def get_criteria_list(df_comp, code, code_column):
     return out
 
 def insert_criteria(ws, start_cell, criteria_list):
-    """Insère une liste verticalement en utilisant safe_write (gère fusion)."""
     col = ''.join(filter(str.isalpha, start_cell))
     row0 = int(''.join(filter(str.isdigit, start_cell)))
     for i, item in enumerate(criteria_list):
         safe_write(ws, f"{col}{row0 + i}", item)
 
-# ======================
-# Génération FT
-# ======================
-def generate_filled_ft():
-    # 1) ouvrir modèle
-    wb = load_workbook("Modèle FT.xlsx")
-    ws = wb["TYPE_FROID"]
-
-    # 2) sélectionner la BONNE ligne (tous les filtres)
-    sel = df[
-        (df["Code_Pays"] == code_pays) &
-        (df["Marque"]    == marque) &
-        (df["Modele"]    == modele) &
-        (df["Code_PF"]   == code_pf)
-    ]
-    if standard_pf:
-        sel = sel[sel["Standard_PF"] == standard_pf]
-
-    if sel.empty:
-        # sécurité : si rien trouvé via filtres, fallback par Code_PF
-        sel = df[df["Code_PF"] == code_pf]
-
-    selected_row = sel.iloc[0]
-
-    # 3) remplir dimensions
-    safe_write(ws, "G6",  selected_row.get("W int  utile  sur plinthe", ""))
-    safe_write(ws, "G7",  selected_row.get("L int  utile  sur plinthe", ""))
-    safe_write(ws, "G8",  selected_row.get("H", ""))
-    safe_write(ws, "I5",  selected_row.get("L", ""))
-    safe_write(ws, "I6",  selected_row.get("Z", ""))
-    safe_write(ws, "I7",  selected_row.get("Hc", ""))
-    safe_write(ws, "I8",  selected_row.get("F", ""))
-    safe_write(ws, "I9", selected_row.get("X", ""))
-
-    # 4) bloc PTAC
-    safe_write(ws, "G11", selected_row.get("PTAC", ""))
-    safe_write(ws, "G12", selected_row.get("CU", ""))
-    safe_write(ws, "G13", selected_row.get("Volume", ""))
-    safe_write(ws, "G14", selected_row.get("palettes 800 x 1200 mm", ""))
-
-    #entete
-    entete = f"{marque}     {modele}     {code_pf}     {standard_pf}"
-    safe_write(ws, "B1", entete)
-
-    def insert_criteria_extended(ws, start_cell, criteria_list, overflow_col="D", max_rows=7):
-        start_col = ''.join(filter(str.isalpha, start_cell))
-        start_row = int(''.join(filter(str.isdigit, start_cell)))
+def insert_criteria_extended(ws, start_cell, criteria_list, overflow_col="D", max_rows=7):
+    start_col = ''.join(filter(str.isalpha, start_cell))
+    start_row = int(''.join(filter(str.isdigit, start_cell)))
 
     for i, item in enumerate(criteria_list):
         if i < max_rows:
@@ -195,9 +147,48 @@ def generate_filled_ft():
         except Exception as e:
             print(f"Erreur cellule {cell_ref} : {e}")
 
+# ======================
+# Génération FT
+# ======================
+def generate_filled_ft():
+    wb = load_workbook("Modèle FT.xlsx")
+    ws = wb["TYPE_FROID"]
 
+    sel = df[
+        (df["Code_Pays"] == code_pays) &
+        (df["Marque"]    == marque) &
+        (df["Modele"]    == modele) &
+        (df["Code_PF"]   == code_pf)
+    ]
+    if standard_pf:
+        sel = sel[sel["Standard_PF"] == standard_pf]
 
-    # 6) critères composants
+    if sel.empty:
+        sel = df[df["Code_PF"] == code_pf]
+
+    selected_row = sel.iloc[0]
+
+    # Dimensions
+    safe_write(ws, "G6",  selected_row.get("W int  utile  sur plinthe", ""))
+    safe_write(ws, "G7",  selected_row.get("L int  utile  sur plinthe", ""))
+    safe_write(ws, "G8",  selected_row.get("H", ""))
+    safe_write(ws, "I5",  selected_row.get("L", ""))
+    safe_write(ws, "I6",  selected_row.get("Z", ""))
+    safe_write(ws, "I7",  selected_row.get("Hc", ""))
+    safe_write(ws, "I8",  selected_row.get("F", ""))
+    safe_write(ws, "I9",  selected_row.get("X", ""))
+
+    # Bloc PTAC
+    safe_write(ws, "G11", selected_row.get("PTAC", ""))
+    safe_write(ws, "G12", selected_row.get("CU", ""))
+    safe_write(ws, "G13", selected_row.get("Volume", ""))
+    safe_write(ws, "G14", selected_row.get("palettes 800 x 1200 mm", ""))
+
+    # En-tête
+    entete = f"{marque}     {modele}     {code_pf}     {standard_pf}"
+    safe_write(ws, "B1", entete)
+
+    # Composants
     insert_criteria(ws, "B18", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
     insert_criteria(ws, "D18", get_criteria_list(moteur_df, code_moteur, "M_Moteur"))
     insert_criteria(ws, "F18", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
@@ -205,7 +196,6 @@ def generate_filled_ft():
     insert_criteria_extended(ws, "B58", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
     insert_criteria_extended(ws, "B67", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
 
-    # 7) export
     output = BytesIO()
     wb.save(output)
     output.seek(0)
