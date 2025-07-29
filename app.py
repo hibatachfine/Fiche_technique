@@ -173,11 +173,10 @@ def generate_filled_ft():
     safe_write(ws, "G13", selected_row.get("Volume", ""))
     safe_write(ws, "G14", selected_row.get("palettes 800 x 1200 mm", ""))
 
-    # 5) entête
-    safe_write(ws, "B1", marque)
-    safe_write(ws, "C1", modele)
-    safe_write(ws, "D1", code_pf)
-    safe_write(ws, "G1", standard_pf)
+    #entete
+    entete = f"{marque}     {modele}     {code_pf}     {standard_pf}"
+    safe_write(ws, "B1", entete)
+
 
     # 6) critères composants
     insert_criteria(ws, "B18", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
