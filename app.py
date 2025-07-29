@@ -180,10 +180,10 @@ def generate_filled_ft():
     safe_write(ws, "J9",  selected_row.get("X", ""))
 
     # Bloc PTAC
-    safe_write(ws, "G11", selected_row.get("PTAC", ""))
-    safe_write(ws, "G12", selected_row.get("CU", ""))
-    safe_write(ws, "G13", selected_row.get("Volume", ""))
-    safe_write(ws, "G14", selected_row.get("palettes 800 x 1200 mm", ""))
+    safe_write(ws, "H11", selected_row.get("PTAC", ""))
+    safe_write(ws, "H12", selected_row.get("CU", ""))
+    safe_write(ws, "H13", selected_row.get("Volume", ""))
+    safe_write(ws, "H14", selected_row.get("palettes 800 x 1200 mm", ""))
 
     # En-tête
     entete = f"{marque}     {modele}     {code_pf}     {standard_pf}"
