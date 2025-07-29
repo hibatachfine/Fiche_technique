@@ -67,7 +67,7 @@ else:
 code_cabine = st.selectbox("CABINES", df_filtered["C_Cabine"].dropna().unique())
 code_chassis = st.selectbox("CHASSIS", df_filtered["C_Chassis"].dropna().unique())
 code_caisse = st.selectbox("CAISSE", df_filtered["C_Caisse"].dropna().unique())
-code_moteur = st.selectbox("MoOTEURS", df_filtered["M_moteur"].dropna().unique())
+code_moteur = st.selectbox("MOTEURS", df_filtered["M_moteur"].dropna().unique())
 code_frigo = st.selectbox("FRIGO", df_filtered["C_Groupe Frigorifique"].dropna().unique())
 code_hayon = st.selectbox("HAYONS", df_filtered["C_Hayon"].dropna().unique())
  
