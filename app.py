@@ -86,24 +86,14 @@ def insert_criteria(ws, start_cell, criteria_list):
         row = int(''.join(filter(str.isdigit, start_cell)))
     except ValueError:
         return
-
+ 
     for i, item in enumerate(criteria_list):
-        cell_ref = f"{col}{row + i}"
-
-        # Vérifie si la cellule est fusionnée et récupère la cellule principale
-        for merged_range in ws.merged_cells.ranges:
-            if cell_ref in merged_range:
-                cell_ref = merged_range.bounds[:2]  # (min_col, min_row)
-                col_letter = ws.cell(row=cell_ref[1], column=cell_ref[0]).column_letter
-                cell_ref = f"{col_letter}{cell_ref[1]}"
-                break
-
         try:
+            cell_ref = f"{col}{row + i}"
             value = str(item).strip() if item is not None else ""
             ws[cell_ref] = value
         except Exception as e:
             print(f"Erreur cellule {cell_ref} : {e}")
-
  
 # --- Génération de la fiche technique ---
 def generate_filled_ft():
