@@ -177,14 +177,37 @@ def generate_filled_ft():
     entete = f"{marque}     {modele}     {code_pf}     {standard_pf}"
     safe_write(ws, "B1", entete)
 
+    def insert_criteria_extended(ws, start_cell, criteria_list, overflow_col="D", max_rows=7):
+    """
+    Insère une liste de critères à partir de start_cell.
+    Si la liste dépasse max_rows, continue dans overflow_col à la même ligne.
+    """
+    start_col = ''.join(filter(str.isalpha, start_cell))
+    start_row = int(''.join(filter(str.isdigit, start_cell)))
+
+    for i, item in enumerate(criteria_list):
+        if i < max_rows:
+            col = start_col
+            row = start_row + i
+        else:
+            col = overflow_col
+            row = start_row + (i - max_rows)
+
+        cell_ref = f"{col}{row}"
+        try:
+            ws[cell_ref] = str(item).strip()
+        except Exception as e:
+            print(f"Erreur cellule {cell_ref} : {e}")
+
+
 
     # 6) critères composants
     insert_criteria(ws, "B18", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
-    insert_criteria(ws, "E18", get_criteria_list(moteur_df, code_moteur, "M_Moteur"))
-    insert_criteria(ws, "G18", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
+    insert_criteria(ws, "D18", get_criteria_list(moteur_df, code_moteur, "M_Moteur"))
+    insert_criteria(ws, "F18", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
     insert_criteria(ws, "B37", get_criteria_list(caisse_df,  code_caisse,  "C_Caisse"))
-    insert_criteria(ws, "B57", get_criteria_list(frigo_df,   code_frigo,   "C_Groupe Frigorifique"))
-    insert_criteria(ws, "B67", get_criteria_list(hayon_df,   code_hayon,   "C_Hayon"))
+    insert_criteria_extended(ws, "B58", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
+    insert_criteria_extended(ws, "B67", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
 
     # 7) export
     output = BytesIO()
