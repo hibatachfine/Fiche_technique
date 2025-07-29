@@ -103,34 +103,34 @@ def generate_filled_ft():
     selected_row = df[df["Code_PF"] == code_pf].iloc[0]
  
     # Dimensions 
-    ws["J6"] = selected_row.get("L", "")
-    ws["J7"] = selected_row.get("Z", "")
-    ws["F6"] = selected_row.get("W int utile sur plinthe", "")
-    ws["F7"] = selected_row.get("L int utile sur plinthe", "")
-    ws["F8"] = selected_row.get("H", "")
-    ws["J8"] = selected_row.get("Hc", "")
-    ws["J9"] = selected_row.get("F", "")
-    ws["J10"] = selected_row.get("X", "")
+    ws["I6"] = selected_row.get("L", "")
+    ws["I7"] = selected_row.get("Z", "")
+    ws["I6"] = selected_row.get("W int utile sur plinthe", "")
+    ws["G7"] = selected_row.get("L int utile sur plinthe", "")
+    ws["G8"] = selected_row.get("H", "")
+    ws["G8"] = selected_row.get("Hc", "")
+    ws["I9"] = selected_row.get("F", "")
+    ws["I10"] = selected_row.get("X", "")
  
     # Bloc PTAC
-    ws["H15"] = selected_row.get("PTAC", "")
-    ws["H16"] = selected_row.get("CU", "")
-    ws["H17"] = selected_row.get("Volume", "")
-    ws["H18"] = selected_row.get("palettes 800 x 1200 mm", "")
+    ws["G12"] = selected_row.get("PTAC", "")
+    ws["G13"] = selected_row.get("CU", "")
+    ws["G14"] = selected_row.get("Volume", "")
+    ws["G15"] = selected_row.get("palettes 800 x 1200 mm", "")
  
     # Infos générales
-    ws["B4"] = marque
-    ws["C4"] = modele
-    ws["E4"] = code_pf
-    ws["G4"] = standard_pf
+    ws["B2"] = marque
+    ws["C2"] = modele
+    ws["D2"] = code_pf
+    ws["G2"] = standard_pf
  
     # Insertion critères
-    insert_criteria(ws, "B22", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
-    insert_criteria(ws, "E22", get_criteria_list(moteur_df, code_moteur, "M_moteur"))
-    insert_criteria(ws, "G22", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
-    insert_criteria(ws, "B54", get_criteria_list(caisse_df, code_caisse, "C_Caisse"))
-    insert_criteria(ws, "B64", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
-    insert_criteria(ws, "B73", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
+    insert_criteria(ws, "B19", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
+    insert_criteria(ws, "E19", get_criteria_list(moteur_df, code_moteur, "M_moteur"))
+    insert_criteria(ws, "G19", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
+    insert_criteria(ws, "B38", get_criteria_list(caisse_df, code_caisse, "C_Caisse"))
+    insert_criteria(ws, "B59", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
+    insert_criteria(ws, "B68", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
  
     # Export fichier
     output = BytesIO()
