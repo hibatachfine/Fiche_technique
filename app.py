@@ -178,8 +178,8 @@ def generate_filled_ft():
     safe_write(ws, "B1", entete)
 
     def insert_criteria_extended(ws, start_cell, criteria_list, overflow_col="D", max_rows=7):
-    start_col = ''.join(filter(str.isalpha, start_cell))
-    start_row = int(''.join(filter(str.isdigit, start_cell)))
+        start_col = ''.join(filter(str.isalpha, start_cell))
+        start_row = int(''.join(filter(str.isdigit, start_cell)))
 
     for i, item in enumerate(criteria_list):
         if i < max_rows:
