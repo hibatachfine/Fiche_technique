@@ -64,12 +64,12 @@ else:
     standard_pf = ""
     st.warning("Aucune valeur Standard PF trouvée pour ce Code PF.")
  
-code_cabine = st.selectbox("Cabine", df_filtered["C_Cabine"].dropna().unique())
-code_chassis = st.selectbox("Châssis", df_filtered["C_Chassis"].dropna().unique())
-code_caisse = st.selectbox("Caisse", df_filtered["C_Caisse"].dropna().unique())
-code_moteur = st.selectbox("Moteur", df_filtered["M_moteur"].dropna().unique())
-code_frigo = st.selectbox("Groupe Frigorifique", df_filtered["C_Groupe Frigorifique"].dropna().unique())
-code_hayon = st.selectbox("Hayon", df_filtered["C_Hayon"].dropna().unique())
+code_cabine = st.selectbox("CABINES", df_filtered["C_Cabine"].dropna().unique())
+code_chassis = st.selectbox("CHASSIS", df_filtered["C_Chassis"].dropna().unique())
+code_caisse = st.selectbox("CAISSE", df_filtered["C_Caisse"].dropna().unique())
+code_moteur = st.selectbox("MoOTEURS", df_filtered["M_moteur"].dropna().unique())
+code_frigo = st.selectbox("FRIGO", df_filtered["C_Groupe Frigorifique"].dropna().unique())
+code_hayon = st.selectbox("HAYONS", df_filtered["C_Hayon"].dropna().unique())
  
 # --- Fonctions utilitaires ---
 def get_criteria_list(df, code, code_column):
