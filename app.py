@@ -169,7 +169,8 @@ def generate_filled_ft():
     # Dimensions
     safe_write(ws, "G6",  selected_row.get("W int  utile  sur plinthe", ""))
     safe_write(ws, "G7",  selected_row.get("L int  utile  sur plinthe", ""))
-    safe_write(ws, "G8",  selected_row.get("H", ""))
+    safe_write(ws, "G8",  selected_row.get("H intérieure", ""))
+    safe_write(ws, "G9",  selected_row.get("H", ""))  
     safe_write(ws, "I5",  selected_row.get("L", ""))
     safe_write(ws, "I6",  selected_row.get("Z", ""))
     safe_write(ws, "I7",  selected_row.get("Hc", ""))
