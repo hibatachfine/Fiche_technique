@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 from io import BytesIO
 from openpyxl import load_workbook
- 
+from openpyxl.utils import column_index_from_string
+
 # --- Authentification ---
 def check_password():
     def password_entered():
@@ -11,7 +12,7 @@ def check_password():
             del st.session_state["password"]
         else:
             st.session_state["password_correct"] = False
- 
+
     if "password_correct" not in st.session_state:
         st.text_input("Mot de passe", type="password", on_change=password_entered, key="password")
         st.stop()
@@ -19,14 +20,14 @@ def check_password():
         st.text_input("Mot de passe", type="password", on_change=password_entered, key="password")
         st.error("Mot de passe incorrect")
         st.stop()
- 
+
 check_password()
- 
+
 # --- Interface ---
 st.image("petit_forestier_logo_officiel.png", width=700)
 st.markdown("<h1 style='color:#057A20;'>Générateur de Fiches Techniques</h1>", unsafe_allow_html=True)
 st.markdown("---")
- 
+
 # --- Chargement des fichiers Excel ---
 try:
     df = pd.read_excel("bdd_ht.xlsx", sheet_name="FS_referentiel_produits_std")
@@ -39,38 +40,43 @@ try:
 except Exception as e:
     st.error(f"Erreur lors du chargement des fichiers : {e}")
     st.stop()
- 
-# --- Normalisation des noms de colonnes (évite les \n) ---
+
+# --- Normalisation des colonnes ---
 df.columns = df.columns.str.replace('\n', ' ').str.strip()
- 
+cabine_df.columns = cabine_df.columns.str.strip()
+chassis_df.columns = chassis_df.columns.str.strip()
+caisse_df.columns = caisse_df.columns.str.strip()
+moteur_df.columns = moteur_df.columns.str.strip()
+frigo_df.columns = frigo_df.columns.str.strip()
+hayon_df.columns = hayon_df.columns.str.strip()
+
 # --- Filtres utilisateur ---
 code_pays = st.selectbox("Code pays", sorted(df["Code_Pays"].dropna().unique()))
 df_filtered = df[df["Code_Pays"] == code_pays]
- 
+
 marque = st.selectbox("Marque", sorted(df_filtered["Marque"].dropna().unique()))
 df_filtered = df_filtered[df_filtered["Marque"] == marque]
- 
+
 modele = st.selectbox("Modèle", sorted(df_filtered["Modele"].dropna().unique()))
 df_filtered = df_filtered[df_filtered["Modele"] == modele]
- 
+
 code_pf = st.selectbox("Code PF", sorted(df_filtered["Code_PF"].dropna().unique()))
 df_filtered = df_filtered[df_filtered["Code_PF"] == code_pf]
- 
-# Ajout du filtre Standard_PF
+
 if "Standard_PF" in df_filtered.columns and not df_filtered["Standard_PF"].dropna().empty:
     standard_pf = st.selectbox("Standard PF", sorted(df_filtered["Standard_PF"].dropna().unique()))
     df_filtered = df_filtered[df_filtered["Standard_PF"] == standard_pf]
 else:
     standard_pf = ""
     st.warning("Aucune valeur Standard PF trouvée pour ce Code PF.")
- 
-code_cabine = st.selectbox("CABINES", df_filtered["C_Cabine"].dropna().unique())
-code_chassis = st.selectbox("CHASSIS", df_filtered["C_Chassis"].dropna().unique())
-code_caisse = st.selectbox("CAISSE", df_filtered["C_Caisse"].dropna().unique())
-code_moteur = st.selectbox("MOTEURS", df_filtered["M_Moteur"].dropna().unique())
-code_frigo = st.selectbox("FRIGO", df_filtered["C_Groupe Frigorifique"].dropna().unique())
-code_hayon = st.selectbox("HAYONS", df_filtered["C_Hayon"].dropna().unique())
- 
+
+code_cabine = st.selectbox("Cabine", df_filtered["C_Cabine"].dropna().unique())
+code_chassis = st.selectbox("Châssis", df_filtered["C_Chassis"].dropna().unique())
+code_caisse = st.selectbox("Caisse", df_filtered["C_Caisse"].dropna().unique())
+code_moteur = st.selectbox("Moteur", df_filtered["M_Moteur"].dropna().unique())
+code_frigo = st.selectbox("Groupe Frigorifique", df_filtered["C_Groupe Frigorifique"].dropna().unique())
+code_hayon = st.selectbox("Hayon", df_filtered["C_Hayon"].dropna().unique())
+
 # --- Fonctions utilitaires ---
 def get_criteria_list(df, code, code_column):
     row = df[df[code_column] == code]
@@ -79,14 +85,13 @@ def get_criteria_list(df, code, code_column):
     row = row.iloc[0].dropna()
     exclude = [code_column, 'Produit (P) / Option (O)']
     return [str(val).strip() for col, val in row.items() if col not in exclude and str(val).strip().lower() != 'nan' and str(val).strip() != '']
- 
+
 def insert_criteria(ws, start_cell, criteria_list):
     col = ''.join(filter(str.isalpha, start_cell))
     try:
         row = int(''.join(filter(str.isdigit, start_cell)))
     except ValueError:
         return
- 
     for i, item in enumerate(criteria_list):
         try:
             cell_ref = f"{col}{row + i}"
@@ -94,54 +99,57 @@ def insert_criteria(ws, start_cell, criteria_list):
             ws[cell_ref] = value
         except Exception as e:
             print(f"Erreur cellule {cell_ref} : {e}")
- 
+
+def safe_write(ws, cell_ref, value):
+    col_letter = ''.join(filter(str.isalpha, cell_ref))
+    row_number = int(''.join(filter(str.isdigit, cell_ref)))
+    col_index = column_index_from_string(col_letter)
+    for merged in ws.merged_cells.ranges:
+        if cell_ref in merged:
+            min_col, min_row, *_ = merged.bounds
+            col_index = min_col
+            row_number = min_row
+            break
+    ws.cell(row=row_number, column=col_index).value = value
+
+# --- Génération de la fiche technique ---
 def generate_filled_ft():
     wb = load_workbook("Modèle FT.xlsx")
     ws = wb["TYPE_FROID"]
-
     selected_row = df[df["Code_PF"] == code_pf].iloc[0]
+    st.write("Ligne sélectionnée :", selected_row.to_dict())  # Debug temporaire
 
-    # Dimensions
-    ws["G6"] = selected_row.get("W int  utile  sur plinthe", "")
-    ws["G7"] = selected_row.get("L int  utile  sur plinthe", "")
-    ws["G8"] = selected_row.get("H", "")
-    ws["I6"] = selected_row.get("L", "")
-    ws["I7"] = selected_row.get("Z", "")
-    ws["I8"] = selected_row.get("Hc", "")
-    ws["I9"] = selected_row.get("F", "")
-    ws["I10"] = selected_row.get("X", "")
+    safe_write(ws, "G6", selected_row.get("W int  utile  sur plinthe", ""))
+    safe_write(ws, "G7", selected_row.get("L int  utile  sur plinthe", ""))
+    safe_write(ws, "G8", selected_row.get("H", ""))
+    safe_write(ws, "I6", selected_row.get("L", ""))
+    safe_write(ws, "I7", selected_row.get("Z", ""))
+    safe_write(ws, "I8", selected_row.get("Hc", ""))
+    safe_write(ws, "I9", selected_row.get("F", ""))
+    safe_write(ws, "I10", selected_row.get("X", ""))
 
-    # Bloc PTAC
-    ws["G11"] = selected_row.get("PTAC", "")
-    ws["G12"] = selected_row.get("CU", "")
-    ws["G13"] = selected_row.get("Volume", "")
-    ws["G14"] = selected_row.get("palettes 800 x 1200 mm", "")
+    safe_write(ws, "G12", selected_row.get("PTAC", ""))
+    safe_write(ws, "G13", selected_row.get("CU", ""))
+    safe_write(ws, "G14", selected_row.get("Volume", ""))
+    safe_write(ws, "G15", selected_row.get("palettes 800 x 1200 mm", ""))
 
-    # Infos générales
-    ws["B1"] = marque
-    ws["C1"] = modele
-    ws["D1"] = code_pf
-    ws["G1"] = standard_pf
+    safe_write(ws, "B2", marque)
+    safe_write(ws, "C2", modele)
+    safe_write(ws, "D2", code_pf)
+    safe_write(ws, "G2", standard_pf)
 
-    # Insertion critères (noms de colonnes exacts)
-    insert_criteria(ws, "B18", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
-    insert_criteria(ws, "D18", get_criteria_list(moteur_df, code_moteur, "M_Moteur"))
-    insert_criteria(ws, "F18", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
-    insert_criteria(ws, "B37", get_criteria_list(caisse_df, code_caisse, "C_Caisse"))
-    insert_criteria(ws, "B58", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
-    insert_criteria(ws, "B67", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
+    insert_criteria(ws, "B19", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
+    insert_criteria(ws, "E19", get_criteria_list(moteur_df, code_moteur, "M_Moteur"))
+    insert_criteria(ws, "G19", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
+    insert_criteria(ws, "B38", get_criteria_list(caisse_df, code_caisse, "C_Caisse"))
+    insert_criteria(ws, "B59", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
+    insert_criteria(ws, "B68", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
 
     output = BytesIO()
     wb.save(output)
     output.seek(0)
     return output
 
-    # Export fichier
-    output = BytesIO()
-    wb.save(output)
-    output.seek(0)
-    return output
- 
 # --- Téléchargement ---
 st.download_button(
     label="Télécharger la fiche technique",
