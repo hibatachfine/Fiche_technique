@@ -108,6 +108,8 @@ def safe_write(ws, cell_ref, value):
 
     ws.cell(row=row_number, column=col_index).value = value
 
+
+
 def insert_criteria(ws, start_cell, criteria_list):
     col = ''.join(filter(str.isalpha, start_cell))
     row0 = int(''.join(filter(str.isdigit, start_cell)))
