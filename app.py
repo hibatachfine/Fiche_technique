@@ -169,15 +169,15 @@ def generate_filled_ft():
     selected_row = sel.iloc[0]
 
     # Dimensions
-    safe_write(ws, "G6",  selected_row.get("W int  utile  sur plinthe", ""))
-    safe_write(ws, "G7",  selected_row.get("L int  utile  sur plinthe", ""))
-    safe_write(ws, "G8",  selected_row.get("H int", ""))
-    safe_write(ws, "G9",  selected_row.get("H", ""))  
-    safe_write(ws, "I5",  selected_row.get("L", ""))
-    safe_write(ws, "I6",  selected_row.get("Z", ""))
-    safe_write(ws, "I7",  selected_row.get("Hc", ""))
-    safe_write(ws, "I8",  selected_row.get("F", ""))
-    safe_write(ws, "I9",  selected_row.get("X", ""))
+    safe_write(ws, "H6",  selected_row.get("W int  utile  sur plinthe", ""))
+    safe_write(ws, "H7",  selected_row.get("L int  utile  sur plinthe", ""))
+    safe_write(ws, "H8",  selected_row.get("H int", ""))
+    safe_write(ws, "H9",  selected_row.get("H", ""))  
+    safe_write(ws, "J5",  selected_row.get("L", ""))
+    safe_write(ws, "J6",  selected_row.get("Z", ""))
+    safe_write(ws, "J7",  selected_row.get("Hc", ""))
+    safe_write(ws, "J8",  selected_row.get("F", ""))
+    safe_write(ws, "J9",  selected_row.get("X", ""))
 
     # Bloc PTAC
     safe_write(ws, "G11", selected_row.get("PTAC", ""))
