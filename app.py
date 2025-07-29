@@ -112,24 +112,24 @@ def generate_filled_ft():
     ws["I10"] = selected_row.get("X", "")
 
     # Bloc PTAC
-    ws["G12"] = selected_row.get("PTAC", "")
-    ws["G13"] = selected_row.get("CU", "")
-    ws["G14"] = selected_row.get("Volume", "")
-    ws["G15"] = selected_row.get("palettes 800 x 1200 mm", "")
+    ws["G11"] = selected_row.get("PTAC", "")
+    ws["G12"] = selected_row.get("CU", "")
+    ws["G13"] = selected_row.get("Volume", "")
+    ws["G14"] = selected_row.get("palettes 800 x 1200 mm", "")
 
     # Infos générales
-    ws["B2"] = marque
-    ws["C2"] = modele
-    ws["D2"] = code_pf
-    ws["G2"] = standard_pf
+    ws["B1"] = marque
+    ws["C1"] = modele
+    ws["D1"] = code_pf
+    ws["G1"] = standard_pf
 
     # Insertion critères (noms de colonnes exacts)
-    insert_criteria(ws, "B19", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
-    insert_criteria(ws, "E19", get_criteria_list(moteur_df, code_moteur, "M_Moteur"))
-    insert_criteria(ws, "G19", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
-    insert_criteria(ws, "B38", get_criteria_list(caisse_df, code_caisse, "C_Caisse"))
-    insert_criteria(ws, "B59", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
-    insert_criteria(ws, "B68", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
+    insert_criteria(ws, "B18", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
+    insert_criteria(ws, "E18", get_criteria_list(moteur_df, code_moteur, "M_Moteur"))
+    insert_criteria(ws, "F18", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
+    insert_criteria(ws, "B37", get_criteria_list(caisse_df, code_caisse, "C_Caisse"))
+    insert_criteria(ws, "B58", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
+    insert_criteria(ws, "B67", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
 
     output = BytesIO()
     wb.save(output)
