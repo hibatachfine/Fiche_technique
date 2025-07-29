@@ -125,7 +125,7 @@ def generate_filled_ft():
 
     # Insertion critères (noms de colonnes exacts)
     insert_criteria(ws, "B18", get_criteria_list(cabine_df, code_cabine, "C_Cabine"))
-    insert_criteria(ws, "E18", get_criteria_list(moteur_df, code_moteur, "M_Moteur"))
+    insert_criteria(ws, "D18", get_criteria_list(moteur_df, code_moteur, "M_Moteur"))
     insert_criteria(ws, "F18", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
     insert_criteria(ws, "B37", get_criteria_list(caisse_df, code_caisse, "C_Caisse"))
     insert_criteria(ws, "B58", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
