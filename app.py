@@ -194,8 +194,8 @@ def generate_filled_ft():
     insert_criteria(ws, "D18", get_criteria_list(moteur_df, code_moteur, "M_Moteur"))
     insert_criteria(ws, "F18", get_criteria_list(chassis_df, code_chassis, "C_Chassis"))
     insert_criteria(ws, "B37", get_criteria_list(caisse_df,  code_caisse,  "C_Caisse"))
-    insert_criteria_extended(ws, "B58", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
-    insert_criteria_extended(ws, "B67", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
+    insert_criteria_extended(ws, "B53", get_criteria_list(frigo_df, code_frigo, "C_Groupe Frigorifique"))
+    insert_criteria_extended(ws, "B61", get_criteria_list(hayon_df, code_hayon, "C_Hayon"))
 
     output = BytesIO()
     wb.save(output)
