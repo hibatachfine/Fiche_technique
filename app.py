@@ -108,21 +108,6 @@ def safe_write(ws, cell_ref, value):
 
     ws.cell(row=row_number, column=col_index).value = value
 
-def get_criteria_list(df_comp, code, code_column):
-    row = df_comp[df_comp[code_column] == code]
-    if row.empty:
-        return []
-    row = row.iloc[0].dropna()
-    exclude = {code_column, 'Produit (P) / Option (O)'}
-    out = []
-    for col, val in row.items():
-        if col in exclude:
-            continue
-        s = str(val).strip()
-        if s and s.lower() != "nan":
-            out.append(s)
-    return out
-
 def insert_criteria(ws, start_cell, criteria_list):
     col = ''.join(filter(str.isalpha, start_cell))
     row0 = int(''.join(filter(str.isdigit, start_cell)))
