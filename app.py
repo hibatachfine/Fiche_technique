@@ -6,15 +6,14 @@ from openpyxl.utils import column_index_from_string
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 
-# ======================
+
 # Mots de passe
-# ======================
-MDP_COMMERCIAL = "ft.commercial"
+MDP_COMMERCIAL = "Ft.commercial"
 MDP_INTERNE = "FT.petitforestier"
 
-# ======================
+
 # Authentification
-# ======================
+
 def check_password():
     def password_entered():
         entered = st.session_state.get("password")
@@ -39,16 +38,15 @@ def check_password():
 
 check_password()
 
-# ======================
 # Interface
-# ======================
+
 st.image("petit_forestier_logo_officiel.png", width=700)
 st.markdown("<h1 style='color:#057A20;'>Générateur de Fiches Techniques</h1>", unsafe_allow_html=True)
 st.markdown("---")
 
-# ======================
+
 # Chargement des données
-# ======================
+
 try:
     df = pd.read_excel("bdd_ht.xlsx", sheet_name="FS_referentiel_produits_std")
     cabine_df = pd.read_excel("bdd_ht.xlsx", sheet_name="CABINES")
@@ -70,9 +68,8 @@ moteur_df.columns  = moteur_df.columns.str.strip()
 frigo_df.columns   = frigo_df.columns.str.strip()
 hayon_df.columns   = hayon_df.columns.str.strip()
 
-# ======================
 # Filtres
-# ======================
+
 code_pays = st.selectbox("Code pays", sorted(df["Code_Pays"].dropna().unique()))
 df_filtered = df[df["Code_Pays"] == code_pays]
 
@@ -99,9 +96,9 @@ code_moteur  = st.selectbox("Moteur",  df_filtered["M_Moteur"].dropna().unique()
 code_frigo   = st.selectbox("Groupe Frigorifique", df_filtered["C_Groupe Frigorifique"].dropna().unique())
 code_hayon   = st.selectbox("Hayon",   df_filtered["C_Hayon"].dropna().unique())
 
-# ======================
+
 # Utilitaires
-# ======================
+
 def to_cell_value(x):
     if pd.isna(x):
         return ""
@@ -161,9 +158,8 @@ def insert_criteria_extended(ws, start_cell, criteria_list, overflow_col="D", ma
         except Exception as e:
             print(f"Erreur cellule {cell_ref} : {e}")
 
-# ======================
 # Génération FT Excel
-# ======================
+
 def generate_filled_ft():
     wb = load_workbook("Modèle FT.xlsx")
     ws = wb["TYPE_FROID"]
@@ -216,9 +212,8 @@ def generate_filled_ft():
     output.seek(0)
     return output
 
-# ======================
 # Génération PDF
-# ======================
+
 def generate_filled_pdf():
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
@@ -256,22 +251,21 @@ def generate_filled_pdf():
     buffer.seek(0)
     return buffer
 
-# ======================
 # Téléchargement
-# ======================
+
 st.markdown("---")
 role = st.session_state.get("role")
 
 if role == "interne":
     st.download_button(
-        label="📥 Télécharger la fiche technique (Excel modifiable)",
+        label="Télécharger la fiche technique",
         data=generate_filled_ft(),
         file_name=f"FT_{code_pf}.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 elif role == "commercial":
     st.download_button(
-        label="📄 Télécharger la fiche technique (PDF non modifiable)",
+        label="Télécharger la fiche technique",
         data=generate_filled_pdf(),
         file_name=f"FT_{code_pf}.pdf",
         mime="application/pdf"
