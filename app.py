@@ -3,14 +3,28 @@ import pandas as pd
 from io import BytesIO
 from openpyxl import load_workbook
 from openpyxl.utils import column_index_from_string
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+
+# ======================
+# Mots de passe
+# ======================
+MDP_COMMERCIAL = "ft.commercial"
+MDP_INTERNE = "FT.petitforestier"
 
 # ======================
 # Authentification
 # ======================
 def check_password():
     def password_entered():
-        if st.session_state.get("password") == "FT.petitforestier":
+        entered = st.session_state.get("password")
+        if entered == MDP_INTERNE:
             st.session_state["password_correct"] = True
+            st.session_state["role"] = "interne"
+            del st.session_state["password"]
+        elif entered == MDP_COMMERCIAL:
+            st.session_state["password_correct"] = True
+            st.session_state["role"] = "commercial"
             del st.session_state["password"]
         else:
             st.session_state["password_correct"] = False
@@ -121,7 +135,7 @@ def get_criteria_list(df_comp, code, code_column):
         s = str(val).strip()
         if s and s.lower() != "nan":
             out.append(s)
-    return out[1:] if len(out) > 1 else []  # on saute la 1ère valeur
+    return out[1:] if len(out) > 1 else []
 
 def insert_criteria(ws, start_cell, criteria_list):
     col = ''.join(filter(str.isalpha, start_cell))
@@ -148,7 +162,7 @@ def insert_criteria_extended(ws, start_cell, criteria_list, overflow_col="D", ma
             print(f"Erreur cellule {cell_ref} : {e}")
 
 # ======================
-# Génération FT
+# Génération FT Excel
 # ======================
 def generate_filled_ft():
     wb = load_workbook("Modèle FT.xlsx")
@@ -203,11 +217,62 @@ def generate_filled_ft():
     return output
 
 # ======================
+# Génération PDF
+# ======================
+def generate_filled_pdf():
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+
+    y = 800
+    line_height = 15
+
+    def draw(label, value):
+        nonlocal y
+        c.drawString(50, y, f"{label} {value}")
+        y -= line_height
+
+    c.setFont("Helvetica-Bold", 14)
+    draw("FICHE TECHNIQUE - Code PF:", code_pf)
+
+    c.setFont("Helvetica", 11)
+    draw("Marque :", marque)
+    draw("Modèle :", modele)
+    draw("Code Pays :", code_pays)
+    if standard_pf:
+        draw("Standard PF :", standard_pf)
+
+    draw("Cabine :", code_cabine)
+    draw("Moteur :", code_moteur)
+    draw("Châssis :", code_chassis)
+    draw("Caisse :", code_caisse)
+    draw("Frigo :", code_frigo)
+    draw("Hayon :", code_hayon)
+
+    c.setFont("Helvetica-Oblique", 9)
+    draw("", "")
+    c.drawString(50, y, "Document généré automatiquement – Ne pas modifier.")
+    c.save()
+
+    buffer.seek(0)
+    return buffer
+
+# ======================
 # Téléchargement
 # ======================
-st.download_button(
-    label="Télécharger la fiche technique",
-    data=generate_filled_ft(),
-    file_name=f"FT_{code_pf}.xlsx",
-    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-)
+st.markdown("---")
+role = st.session_state.get("role")
+
+if role == "interne":
+    st.download_button(
+        label="📥 Télécharger la fiche technique (Excel modifiable)",
+        data=generate_filled_ft(),
+        file_name=f"FT_{code_pf}.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+elif role == "commercial":
+    st.download_button(
+        label="📄 Télécharger la fiche technique (PDF non modifiable)",
+        data=generate_filled_pdf(),
+        file_name=f"FT_{code_pf}.pdf",
+        mime="application/pdf"
+    )
